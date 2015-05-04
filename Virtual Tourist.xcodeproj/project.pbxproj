@@ -8,11 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		A447A1E61AF78B93001E734A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A1E51AF78B93001E734A /* AppDelegate.swift */; };
-		A447A1E81AF78B93001E734A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A1E71AF78B93001E734A /* ViewController.swift */; };
 		A447A1EB1AF78B93001E734A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A447A1E91AF78B93001E734A /* Main.storyboard */; };
 		A447A1ED1AF78B93001E734A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A447A1EC1AF78B93001E734A /* Images.xcassets */; };
 		A447A1F01AF78B93001E734A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A447A1EE1AF78B93001E734A /* LaunchScreen.xib */; };
 		A447A1FC1AF78B94001E734A /* Virtual_TouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A1FB1AF78B94001E734A /* Virtual_TouristTests.swift */; };
+		A447A2071AF78BE4001E734A /* TravelLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A2061AF78BE4001E734A /* TravelLocation.swift */; };
+		A447A20A1AF7961A001E734A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A447A2081AF7961A001E734A /* Model.xcdatamodeld */; };
+		A447A20C1AF796B4001E734A /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A20B1AF796B4001E734A /* CoreDataStackManager.swift */; };
+		A447A20E1AF79803001E734A /* TouristLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A20D1AF79803001E734A /* TouristLocationViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,13 +32,16 @@
 		A447A1E01AF78B93001E734A /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A447A1E41AF78B93001E734A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A447A1E51AF78B93001E734A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A447A1E71AF78B93001E734A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		A447A1EA1AF78B93001E734A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A447A1EC1AF78B93001E734A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A447A1EF1AF78B93001E734A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		A447A1F51AF78B94001E734A /* Virtual TouristTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Virtual TouristTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A447A1FA1AF78B94001E734A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A447A1FB1AF78B94001E734A /* Virtual_TouristTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Virtual_TouristTests.swift; sourceTree = "<group>"; };
+		A447A2061AF78BE4001E734A /* TravelLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelLocation.swift; sourceTree = "<group>"; };
+		A447A2091AF7961A001E734A /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		A447A20B1AF796B4001E734A /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
+		A447A20D1AF79803001E734A /* TouristLocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouristLocationViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,11 +83,9 @@
 		A447A1E21AF78B93001E734A /* Virtual Tourist */ = {
 			isa = PBXGroup;
 			children = (
-				A447A1E51AF78B93001E734A /* AppDelegate.swift */,
-				A447A1E71AF78B93001E734A /* ViewController.swift */,
+				A447A20D1AF79803001E734A /* TouristLocationViewController.swift */,
+				A447A2051AF78BAD001E734A /* Model */,
 				A447A1E91AF78B93001E734A /* Main.storyboard */,
-				A447A1EC1AF78B93001E734A /* Images.xcassets */,
-				A447A1EE1AF78B93001E734A /* LaunchScreen.xib */,
 				A447A1E31AF78B93001E734A /* Supporting Files */,
 			);
 			path = "Virtual Tourist";
@@ -90,6 +94,9 @@
 		A447A1E31AF78B93001E734A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A447A1EE1AF78B93001E734A /* LaunchScreen.xib */,
+				A447A1EC1AF78B93001E734A /* Images.xcassets */,
+				A447A1E51AF78B93001E734A /* AppDelegate.swift */,
 				A447A1E41AF78B93001E734A /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -110,6 +117,16 @@
 				A447A1FA1AF78B94001E734A /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A447A2051AF78BAD001E734A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				A447A20B1AF796B4001E734A /* CoreDataStackManager.swift */,
+				A447A2061AF78BE4001E734A /* TravelLocation.swift */,
+				A447A2081AF7961A001E734A /* Model.xcdatamodeld */,
+			);
+			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,8 +229,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A447A1E81AF78B93001E734A /* ViewController.swift in Sources */,
+				A447A20E1AF79803001E734A /* TouristLocationViewController.swift in Sources */,
+				A447A2071AF78BE4001E734A /* TravelLocation.swift in Sources */,
 				A447A1E61AF78B93001E734A /* AppDelegate.swift in Sources */,
+				A447A20C1AF796B4001E734A /* CoreDataStackManager.swift in Sources */,
+				A447A20A1AF7961A001E734A /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,6 +439,19 @@
 			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		A447A2081AF7961A001E734A /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				A447A2091AF7961A001E734A /* Model.xcdatamodel */,
+			);
+			currentVersion = A447A2091AF7961A001E734A /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = A447A1D81AF78B93001E734A /* Project object */;
 }
