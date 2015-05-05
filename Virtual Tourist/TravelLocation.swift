@@ -8,35 +8,40 @@
 
 import Foundation
 import CoreData
+import MapKit
+
 
 @objc(TravelLocation)
 
 class TravelLocation: NSManagedObject {
-    
-    struct Keys {
-        static let Latitude = "latitude"
-        static let Longitude = "longitude"
-        static let Title = "Title"
-        static let SubTitle = "SubTitle"
-    }
     
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
     @NSManaged var title: String?
     @NSManaged var subTitle : String?
     
+    var annotation : MKPointAnnotation {
+        get {
+            let newAnnotation = MKPointAnnotation()
+            newAnnotation.coordinate = CLLocationCoordinate2DMake(latitude, longitude)
+            newAnnotation.title = title
+            newAnnotation.subtitle = subTitle
+            return newAnnotation
+        }
+    }
+    
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
-    init (dictionary: [String : AnyObject], context: NSManagedObjectContext) {
+    init (annotation: MKPointAnnotation, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("TravelLocation", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        latitude = dictionary[Keys.Latitude] as! Double
-        longitude = dictionary[Keys.Longitude] as! Double
-        title = dictionary[Keys.Title] as? String
-        subTitle = dictionary[Keys.SubTitle] as? String        
-  }
+        latitude = annotation.coordinate.latitude
+        longitude = annotation.coordinate.longitude
+        title = annotation.title
+        subTitle = annotation.subtitle
+    }
     
 }

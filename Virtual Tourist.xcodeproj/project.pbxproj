@@ -15,7 +15,7 @@
 		A447A2071AF78BE4001E734A /* TravelLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A2061AF78BE4001E734A /* TravelLocation.swift */; };
 		A447A20A1AF7961A001E734A /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A447A2081AF7961A001E734A /* Model.xcdatamodeld */; };
 		A447A20C1AF796B4001E734A /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A20B1AF796B4001E734A /* CoreDataStackManager.swift */; };
-		A447A20E1AF79803001E734A /* TouristLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A20D1AF79803001E734A /* TouristLocationViewController.swift */; };
+		A447A20E1AF79803001E734A /* TravelLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A20D1AF79803001E734A /* TravelLocationViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,7 +41,7 @@
 		A447A2061AF78BE4001E734A /* TravelLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelLocation.swift; sourceTree = "<group>"; };
 		A447A2091AF7961A001E734A /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		A447A20B1AF796B4001E734A /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
-		A447A20D1AF79803001E734A /* TouristLocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouristLocationViewController.swift; sourceTree = "<group>"; };
+		A447A20D1AF79803001E734A /* TravelLocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelLocationViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,7 +83,7 @@
 		A447A1E21AF78B93001E734A /* Virtual Tourist */ = {
 			isa = PBXGroup;
 			children = (
-				A447A20D1AF79803001E734A /* TouristLocationViewController.swift */,
+				A447A20D1AF79803001E734A /* TravelLocationViewController.swift */,
 				A447A2051AF78BAD001E734A /* Model */,
 				A447A1E91AF78B93001E734A /* Main.storyboard */,
 				A447A1E31AF78B93001E734A /* Supporting Files */,
@@ -229,7 +229,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A447A20E1AF79803001E734A /* TouristLocationViewController.swift in Sources */,
+				A447A20E1AF79803001E734A /* TravelLocationViewController.swift in Sources */,
 				A447A2071AF78BE4001E734A /* TravelLocation.swift in Sources */,
 				A447A1E61AF78B93001E734A /* AppDelegate.swift in Sources */,
 				A447A20C1AF796B4001E734A /* CoreDataStackManager.swift in Sources */,
