@@ -34,11 +34,86 @@
                     </view>
                     <connections>
                         <outlet property="mapView" destination="eKw-qP-Eb6" id="pMy-fm-HE9"/>
+                        <segue destination="PWS-Vs-ESf" kind="show" identifier="showPhotoAlbum" id="llg-4z-EYG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="360" y="332"/>
+        </scene>
+        <!--Title-->
+        <scene sceneID="jUz-BK-JR6">
+            <objects>
+                <collectionViewController id="HuT-P5-jGB" customClass="PhotoAlbumCollectionViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="ylO-Fg-QAs">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="fP2-Sg-Uys">
+                            <size key="itemSize" width="120" height="100"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="PhotoAlbumCell" id="xKa-5O-yuo" customClass="PhotoAlbumUICollectionViewCell" customModule="Virtual_Tourist" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="120" height="100"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LwA-s5-nqN">
+                                            <rect key="frame" x="8" y="8" width="104" height="84"/>
+                                        </imageView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <constraints>
+                                    <constraint firstAttribute="trailingMargin" secondItem="LwA-s5-nqN" secondAttribute="trailing" id="6jN-85-rkz"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="LwA-s5-nqN" secondAttribute="bottom" id="DTc-kG-txu"/>
+                                    <constraint firstItem="LwA-s5-nqN" firstAttribute="leading" secondItem="xKa-5O-yuo" secondAttribute="leadingMargin" id="XAg-AZ-4hg"/>
+                                    <constraint firstItem="LwA-s5-nqN" firstAttribute="top" secondItem="xKa-5O-yuo" secondAttribute="topMargin" id="eu9-qt-r4K"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="locationImage" destination="LwA-s5-nqN" id="jTt-Nh-l9Z"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="HuT-P5-jGB" id="yaV-nH-D3X"/>
+                            <outlet property="delegate" destination="HuT-P5-jGB" id="ur1-BN-y3U"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" title="Title" id="gxg-Ug-aC2">
+                        <barButtonItem key="leftBarButtonItem" title="&lt; Back" id="Qbj-Rw-kXf">
+                            <connections>
+                                <action selector="goBack:" destination="HuT-P5-jGB" id="5dk-T7-0zu"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="cancel" id="BGG-ZR-1Ce"/>
+                    </navigationItem>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kHg-qO-LAU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1707" y="332"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="a4K-Zx-9go">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="HpO-iX-pLD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="PWS-Vs-ESf" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="2YW-sz-ECx">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="HuT-P5-jGB" kind="relationship" relationship="rootViewController" id="udi-l8-lap"/>
+                    </connections>
+                </navigationController>
+            </objects>
+            <point key="canvasLocation" x="1027" y="332"/>
         </scene>
     </scenes>
 </document>

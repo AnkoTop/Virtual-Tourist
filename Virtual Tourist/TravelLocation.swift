@@ -19,6 +19,7 @@ class TravelLocation: NSManagedObject {
     @NSManaged var longitude: Double
     @NSManaged var title: String?
     @NSManaged var subTitle : String?
+    @NSManaged var photos : [Photo]?
     
     var annotation : MKPointAnnotation {
         get {

@@ -10,41 +10,36 @@ import UIKit
 import CoreData
 import MapKit
 
-class TravelLocationViewController: UIViewController, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
+class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
 
+    var selectedLocation: TravelLocation!
+    
     @IBOutlet weak var mapView: MKMapView!
     
-    override func viewDidLoad() {
+    var locations = [TravelLocation]()
+    
+       override func viewDidLoad() {
         super.viewDidLoad()
         
         //restore MapView from last session
         restoreMapRegion(false)
         
-        //retrieve SavedCoredata
-        fetchedResultsController.performFetch(nil)
-        //show the fetched results on the map
-        let locations = fetchedResultsController.fetchedObjects as! [TravelLocation]
+        //retrieve SavedCoredata and show results on the map
+        locations = fetchAllTravelLocations()
+        
         for location in locations {
             mapView.addAnnotation(location.annotation)
         }
-        
-        
-        fetchedResultsController.delegate = self
-    
         
         // Add longpressrecognizer to the mapView
         let longTap: UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "dropPinOnMap:")
         longTap.numberOfTapsRequired = 0
         longTap.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longTap)
-        
     }
     
     
-    
     // MARK: - Drop pin on map
-    
-    //let annotation = MKPointAnnotation()
     
     func dropPinOnMap(gestureRecognizer : UIGestureRecognizer) {
         if (gestureRecognizer.state == .Ended) {
@@ -60,80 +55,142 @@ class TravelLocationViewController: UIViewController, UIGestureRecognizerDelegat
             CLGeocoder().reverseGeocodeLocation(loc, completionHandler: { (placemarks, error) -> Void in
             
                 if error == nil {
-                
-                    // Placemark data includes information such as the country, state, city, and street address associated with the specified coordinate.
                     let placemark = CLPlacemark(placemark: placemarks[0] as! CLPlacemark)
-                
                     var subthoroughfare = placemark.subThoroughfare != nil ? placemark.subThoroughfare : ""
-                
                     var thoroughfare = placemark.thoroughfare != nil ? placemark.thoroughfare : ""
-                
                     var city = placemark.subAdministrativeArea != nil ? placemark.subAdministrativeArea : ""
                     var state = placemark.administrativeArea != nil ? placemark.administrativeArea : ""
-                
                     var title = "\(subthoroughfare) \(thoroughfare)"
                     var subTitle = "\(city),\(state)"
                 
-                    let annotation = MKPointAnnotation()
+                    var annotation = MKPointAnnotation()
                     annotation.coordinate = location
                     annotation.title = title
                     annotation.subtitle = subTitle
-                 
+                    self.mapView.addAnnotation(annotation)
                     // save to core data
                     let newLocation = TravelLocation(annotation: annotation, context: self.sharedContext)
+                    self.locations.append(newLocation)
                     CoreDataStackManager.sharedInstance().saveContext()
+                    
+                    // Test the flickr api
+                    FlickrClient.sharedInstance().getImagesForLocation(newLocation)
                 }
             })
         }
     }
     
-    // MARK: - Core Data
+    
+    // MARK: - MapviewDelegate
+    
+    // When the region changes by zooming or scrolling: save the new map state
+    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+        saveMapRegion()
+    }
+    
+    
+    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+        let reuseId = "pin"
+        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = true
+            //pinView!.draggable = true
+            pinView!.pinColor = .Purple
+            
+            //delete button on the left side
+            let buttonDelete = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+            buttonDelete.setBackgroundImage(UIImage(named: "trash"), forState: .Normal)
+            buttonDelete.tintColor = UIColor.clearColor()
+            pinView!.leftCalloutAccessoryView = buttonDelete
+            //and information button on the right
+            let buttonInformation = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+            pinView!.rightCalloutAccessoryView = buttonInformation
+
+            
+            
+        }
+        else {
+            pinView!.annotation = annotation
+        }
+        
+        return pinView
+    }
+
+    //Handle the buttonactions of the pin
+    func mapView(mapView: MKMapView!, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        
+        for location in locations {
+            if location.annotation.coordinate.latitude == (annotationView.annotation as! MKPointAnnotation).coordinate.latitude &&
+                location.annotation.coordinate.longitude == (annotationView.annotation as! MKPointAnnotation).coordinate.longitude
+            {
+                selectedLocation = location
+                break
+            }
+        }
+        // either delete the location or show its photos
+        if control == annotationView.leftCalloutAccessoryView {
+            sharedContext.deleteObject(selectedLocation)
+            CoreDataStackManager.sharedInstance().saveContext()
+            self.mapView.removeAnnotation(annotationView.annotation)
+        } else if control == annotationView.rightCalloutAccessoryView {
+            // segue to the collection view
+            performSegueWithIdentifier("showPhotoAlbum", sender: self)
+        }
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        println("prepareForSegue : \(segue.identifier)")
+    
+        if segue.identifier == "showPhotoAlbum" {
+            let navigationController = segue.destinationViewController as! UINavigationController
+            let controller = navigationController.topViewController as! PhotoAlbumCollectionViewController
+        
+            // set the location for the photos
+            controller.location = selectedLocation
+        }
+    }
+    
+    
+    // MARK: - Core Data: use the basic version, the fetchedresultcontroller has no added value
     
     var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
     
-    lazy var fetchedResultsController: NSFetchedResultsController = {
-        
+    func fetchAllTravelLocations() -> [TravelLocation] {
+        var error: NSError?
         let fetchRequest = NSFetchRequest(entityName: "TravelLocation")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "latitude", ascending: true)]
+        let results = sharedContext.executeFetchRequest(fetchRequest, error: &error)
         
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-            managedObjectContext: self.sharedContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        
-        return fetchedResultsController
-        
-        }()
-    
-    // NSFetchedResultControllerDelegate
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-        switch type {
-        case .Insert:
-            mapView.addAnnotation((anObject as! TravelLocation).annotation)
-        case .Delete:
-            mapView.removeAnnotation((anObject as! TravelLocation).annotation)
-        default:
-            println("something other than a delete or insert"  )
+        if let error = error {
+            println("Error in fectchAllTravelLocations(): \(error)")
         }
+        return results as! [TravelLocation]
     }
 
-    
-    // MARK: - Helpers : Save/Restore the zoom level with NSKeyedArchiver
-    
+   
+    // MARK: - NSKeyedArchiver : Save/Restore the map settings
     var filePath : String {
         let manager = NSFileManager.defaultManager()
         let url = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first as! NSURL
         return url.URLByAppendingPathComponent("mapRegionArchive").path!
     }
     
+    struct Keys {
+        static let latitude = "latitude"
+        static let longitude = "longitude"
+        static let latitudeDelta = "latitudeDelta"
+        static let longitudeDelta = "longitudeDelta"
+    }
+    
     func saveMapRegion() {
          let dictionary = [
-            "latitude" : mapView.region.center.latitude,
-            "longitude" : mapView.region.center.longitude,
-            "latitudeDelta" : mapView.region.span.latitudeDelta,
-            "longitudeDelta" : mapView.region.span.longitudeDelta
+            Keys.latitude : mapView.region.center.latitude,
+            Keys.longitude : mapView.region.center.longitude,
+            Keys.latitudeDelta : mapView.region.span.latitudeDelta,
+            Keys.longitudeDelta : mapView.region.span.longitudeDelta
         ]
         
         NSKeyedArchiver.archiveRootObject(dictionary, toFile: filePath)
@@ -142,13 +199,12 @@ class TravelLocationViewController: UIViewController, UIGestureRecognizerDelegat
     func restoreMapRegion(animated: Bool) {
         
         if let regionDictionary = NSKeyedUnarchiver.unarchiveObjectWithFile(filePath) as? [String : AnyObject] {
-            
-            let longitude = regionDictionary["longitude"] as! CLLocationDegrees
-            let latitude = regionDictionary["latitude"] as! CLLocationDegrees
+            let longitude = regionDictionary[Keys.longitude] as! CLLocationDegrees
+            let latitude = regionDictionary[Keys.latitude] as! CLLocationDegrees
             let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             
-            let longitudeDelta = regionDictionary["latitudeDelta"] as! CLLocationDegrees
-            let latitudeDelta = regionDictionary["latitudeDelta"] as! CLLocationDegrees
+            let longitudeDelta = regionDictionary[Keys.longitudeDelta] as! CLLocationDegrees
+            let latitudeDelta = regionDictionary[Keys.latitudeDelta] as! CLLocationDegrees
             let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
             
             let savedRegion = MKCoordinateRegion(center: center, span: span)
@@ -156,15 +212,5 @@ class TravelLocationViewController: UIViewController, UIGestureRecognizerDelegat
             mapView.setRegion(savedRegion, animated: animated)
         }
     }
-}
-
-
-// MARK: - extension of the class
-
-extension TravelLocationViewController : MKMapViewDelegate {
-    
-    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
-        saveMapRegion()
-     }
 }
 
