@@ -14,8 +14,9 @@ import CoreData
 
 class Photo: NSManagedObject {
     
+    @NSManaged var creation : NSDate
     @NSManaged var localFilePath : String
-    @NSManaged var image : NSData
+    @NSManaged var image : NSData?
     @NSManaged var location : TravelLocation
     
     
@@ -23,22 +24,34 @@ class Photo: NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
+    // full init
     init(localFileName: String, imageForLoc: NSData, travelLocation: TravelLocation, context: NSManagedObjectContext){
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
+        creation = NSDate()
         localFilePath = localFileName
         image = imageForLoc
         location = travelLocation
         
     }
     
+    // init without downloaded phot0
+    init(localFileName: String, travelLocation: TravelLocation, context: NSManagedObjectContext){
+        let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
+        super.init(entity: entity, insertIntoManagedObjectContext: context)
+        
+        creation = NSDate()
+        localFilePath = localFileName
+        location = travelLocation
+        
+    }
+
+    
     // manage the filehandling here so we can always change the way we store images
     
     func deleteLocalPhotoFile() {
         // TO DO: delete the file from the directory
-    }
-    
-    
+    }    
     
 }

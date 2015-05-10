@@ -11,49 +11,85 @@ import CoreData
 
 let reuseIdentifier = "PhotoAlbumCell"
 
-class PhotoAlbumCollectionViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-
-    var location: TravelLocation!
+class PhotoAlbumCollectionViewController: UICollectionViewController, UICollectionViewDataSource ,UICollectionViewDelegateFlowLayout {
     
+    // will be set before segue from the mapView
+    var location: TravelLocation!
+    var headerImage : UIImage!
+    
+    @IBOutlet var photoCollectionView: UICollectionView!
     @IBOutlet weak var imageForCell: UIImageView!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        println("Photo: viewDidLoad")
-        println("current location: \(location)")
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-        
-        // Register cell classes
-        //self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        //println("Photo: viewDidLoad")
+        //println("current location: \(location)")
         
         // Fetch the results from coredata
         // if there is no album available get pictures from flickr
-        
-        
+       
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
         
-        println("Photo: viewWillAppear")
+        self.navigationController?.navigationBarHidden = false
+        self.navigationController?.toolbarHidden = true
+        //println("Photo: viewWillAppear")
         
         // Fetch the results from coredata
         fetchedResultsController.performFetch(nil)
         fetchedResultsController.delegate = self
-        //println(fetchedResultsController.fetchedObjects)
-        // if there is no album available get pictures from flickr
+        // check for empty images
+        let qos = Int(DISPATCH_QUEUE_PRIORITY_BACKGROUND.value)
+        dispatch_async(dispatch_get_global_queue(qos, 0)) {
+         for photo in self.location.photos! {
+            if photo.image == nil {
+                 FlickrClient.sharedInstance().getPhotoFromUrl(photo)
+     //            println("nsdata empty: get the picture")
+             }
+        }
+         }
+      //  println("view will appear # fetched : \(fetchedResultsController.fetchedObjects!.count)")
+        if fetchedResultsController.fetchedObjects!.count > 0 {
+          self.navigationController?.toolbarHidden = false
+        } else {
+            FlickrClient.sharedInstance().getImagesForLocation(self.location) {succes, message, error in
+                //do what?
+            }
+        }
+
+       
+    }
+    
+    
+    @IBAction func getNewPhotoCollection(sender: UIBarButtonItem) {
         
+       FlickrClient.sharedInstance().renewImagesForLocation(location) {succes, message, error in
+                                   //do what?
+            if succes {
+                                   // println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+                FlickrClient.sharedInstance().getImagesForLocation(self.location) {succes, message, error in
+                    //println("I'm back")
+                    let qos = Int(DISPATCH_QUEUE_PRIORITY_HIGH.value)
+                    dispatch_async(dispatch_get_global_queue(qos, 0)) {
+                        for photo in self.location.photos! {
+                            if photo.image == nil {
+                                FlickrClient.sharedInstance().getPhotoFromUrl(photo)
+                                //println("nsdata empty: get the picture")
+                            }
+                        }
+                    }
+
+                }
+            } else {println("sucks")}
+        
+        println(message)
     }
-    
-    
-    @IBAction func goBack(sender: UIBarButtonItem) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+   
     }
-    
     
     // MARK: - Core Data Convenience
     
@@ -67,7 +103,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     lazy var fetchedResultsController: NSFetchedResultsController = {
         
         let fetchRequest = NSFetchRequest(entityName: "Photo")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "localFilePath", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creation", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "location == %@", self.location);
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
@@ -95,18 +131,67 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         let sectionInfo = self.fetchedResultsController.sections![section] as!
         NSFetchedResultsSectionInfo
         
+        println(sectionInfo.numberOfObjects)
+        
         return sectionInfo.numberOfObjects
+        
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
     
         // Configure the cell
+        
+        
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! PhotoAlbumUICollectionViewCell
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-        cell.locationImage.image = UIImage(data: photo.image)
-    
+        // check if we have an image or have to show a placeholder
+        if photo.image != nil {
+            cell.locationImage.image = UIImage(data: photo.image!)
+            cell.loadImageActivityIndicator.stopAnimating()
+        } else {
+            cell.locationImage.image = UIImage(named: "placeHolder")
+            cell.loadImageActivityIndicator.startAnimating()
+//            let qos = Int(DISPATCH_QUEUE_PRIORITY_BACKGROUND.value)
+//            dispatch_async(dispatch_get_global_queue(qos, 0)) {
+//                FlickrClient.sharedInstance().getPhotoFromUrl(photo)
+//            }
+        }
+        
+        
+        
+        //add doubletap recognizer to delete
+        let doubleTap = UITapGestureRecognizer(target: self, action: Selector("removeFromCollection:"))
+        doubleTap.numberOfTapsRequired = 2
+        cell.addGestureRecognizer(doubleTap)
+        
+        //println("cellinsert for \(photo.creation)")
+        //println(fetchedResultsController.fetchedObjects!.count)
+
         return cell
+    }
+    
+    func removeFromCollection(gestureRecognizer : UIGestureRecognizer){
+        if let indexPath = self.collectionView?.indexPathForCell(gestureRecognizer.view as! PhotoAlbumUICollectionViewCell) {
+            let photoForDelete = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+            sharedContext.deleteObject(photoForDelete)
+            CoreDataStackManager.sharedInstance().saveContext()
+        }
+
+    }
+    
+    override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath)
+        -> UICollectionReusableView {
+            
+            var header: PhotoAlbumHeaderCollectionReusableView?
+            
+            if kind == UICollectionElementKindSectionHeader {
+                header = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "PhotoAlbumHeader", forIndexPath: indexPath)
+                    as? PhotoAlbumHeaderCollectionReusableView
+                
+                header?.sectionHeaderImage.image = headerImage
+            }
+            return header!
     }
 
     // MARK: UICollectionViewDelegate
@@ -143,13 +228,25 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     
     // MARK: UICollectionViewDelegateFlowLayout
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        
+        // Set Item properties
         // fit 3 foto's horizontal
         let spaceHorizontal = self.collectionView!.frame.width
         var size = (collectionViewLayout as! UICollectionViewFlowLayout).itemSize
-        size.width = spaceHorizontal / 3.15
+        size.width = spaceHorizontal / 3
         //size.height = 9 * (size.width/16)
         size.height = 3 * (size.width/4)
         
+        return size
+    }
+    
+    
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+          var size = (collectionViewLayout as! UICollectionViewFlowLayout).headerReferenceSize
+        size.width = self.collectionView!.frame.width
+        size.height = self.collectionView!.frame.height/10
+   //     println("headersize : \(size)")
         return size
     }
 
@@ -162,9 +259,8 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
 extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate {
     
     
-    
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        println("WillChangeContent")
+       // println("WillChangeContent")
     }
 
     
@@ -175,10 +271,10 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
             
             switch type {
             case .Insert:
-                println("insert")
+                println("insert section")
                 
             case .Delete:
-               println("delete")
+               println("delete section")
                 
             default:
                 return
@@ -187,17 +283,47 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
 
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-            
+        let changedPhoto = anObject as! Photo
         switch type {
             case .Insert:
                  // new pictore added: show it
-                 println("photo inserted")
-                
+               //  println("photo \(changedPhoto.creation) inserted")
+               //  println(fetchedResultsController.fetchedObjects!.count)
+
+                 //NSThread.sleepForTimeInterval(1.0)
+                dispatch_sync(dispatch_get_main_queue()) {
+                   self.collectionView!.insertItemsAtIndexPaths([newIndexPath!])
+                 }
+//                let qos = Int(QOS_CLASS_BACKGROUND.value)
+//                dispatch_async(dispatch_get_global_queue(qos, 0)) {
+//                    FlickrClient.sharedInstance().getPhotoFromUrl(changedPhoto)
+//                }
+        
+            
             case .Delete:
-                println("photo deleted")
+      //          println("photo \(changedPhoto.creation) deleted")
+                self.photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
+     //           println(fetchedResultsController.fetchedObjects!.count)
+//                if fetchedResultsController.fetchedObjects!.count == 0 {
+//                    //let qos = Int(QOS_CLASS_USER_INITIATED.value)
+//                    //dispatch_async(dispatch_get_global_queue(qos, 0)) {
+//                    FlickrClient.sharedInstance().getImagesForLocation(self.location) {succes, message, error in
+//                        //do what?
+//                        println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+//                    }
+//                   // }
+//                }
             case .Update:
-                println("photo updated")
-                
+          //      println("photo \(changedPhoto.creation) updated")
+                if changedPhoto.image != nil {
+//                    //println("update the image")
+                    dispatch_async(dispatch_get_main_queue()) {
+                    if let cell = self.photoCollectionView.cellForItemAtIndexPath(indexPath!) as? PhotoAlbumUICollectionViewCell
+                    {cell.locationImage.image = UIImage(data: changedPhoto.image!)
+                        cell.loadImageActivityIndicator.stopAnimating()}
+                    }
+            }
+            
             case .Move:
                 println("photo moved")
                 
@@ -207,7 +333,11 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
     }
 
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        println("DidChangeContent")
+ //       println("DidChangeContent")
+//       dispatch_async(dispatch_get_main_queue()) {
+//
+//        self.photoCollectionView.reloadData()
+//        }
     }
     
 }

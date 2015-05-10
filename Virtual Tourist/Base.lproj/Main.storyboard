@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="xPL-Xb-8Oy">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -32,25 +32,26 @@
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="eKw-qP-Eb6" secondAttribute="bottom" id="rhg-Wp-mrY"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="Hmd-5F-hef"/>
                     <connections>
                         <outlet property="mapView" destination="eKw-qP-Eb6" id="pMy-fm-HE9"/>
-                        <segue destination="PWS-Vs-ESf" kind="show" identifier="showPhotoAlbum" id="llg-4z-EYG"/>
+                        <segue destination="HuT-P5-jGB" kind="show" identifier="showPhotoAlbum" id="sI5-mJ-nIC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="360" y="332"/>
+            <point key="canvasLocation" x="1774" y="171"/>
         </scene>
-        <!--Title-->
+        <!--What's happening?-->
         <scene sceneID="jUz-BK-JR6">
             <objects>
                 <collectionViewController id="HuT-P5-jGB" customClass="PhotoAlbumCollectionViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="ylO-Fg-QAs">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="fP2-Sg-Uys">
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="fP2-Sg-Uys">
                             <size key="itemSize" width="120" height="100"/>
-                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="headerReferenceSize" width="50" height="50"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
@@ -63,57 +64,89 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LwA-s5-nqN">
-                                            <rect key="frame" x="8" y="8" width="104" height="84"/>
+                                            <rect key="frame" x="4" y="4" width="112" height="92"/>
                                         </imageView>
+                                        <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="VCX-aZ-SuJ">
+                                            <rect key="frame" x="50" y="40" width="20" height="20"/>
+                                        </activityIndicatorView>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <constraints>
-                                    <constraint firstAttribute="trailingMargin" secondItem="LwA-s5-nqN" secondAttribute="trailing" id="6jN-85-rkz"/>
-                                    <constraint firstAttribute="bottomMargin" secondItem="LwA-s5-nqN" secondAttribute="bottom" id="DTc-kG-txu"/>
-                                    <constraint firstItem="LwA-s5-nqN" firstAttribute="leading" secondItem="xKa-5O-yuo" secondAttribute="leadingMargin" id="XAg-AZ-4hg"/>
-                                    <constraint firstItem="LwA-s5-nqN" firstAttribute="top" secondItem="xKa-5O-yuo" secondAttribute="topMargin" id="eu9-qt-r4K"/>
+                                    <constraint firstAttribute="trailingMargin" secondItem="LwA-s5-nqN" secondAttribute="trailing" constant="-4" id="6jN-85-rkz"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="LwA-s5-nqN" secondAttribute="bottom" constant="-4" id="DTc-kG-txu"/>
+                                    <constraint firstItem="LwA-s5-nqN" firstAttribute="leading" secondItem="xKa-5O-yuo" secondAttribute="leadingMargin" constant="-4" id="XAg-AZ-4hg"/>
+                                    <constraint firstItem="LwA-s5-nqN" firstAttribute="top" secondItem="xKa-5O-yuo" secondAttribute="topMargin" constant="-4" id="eu9-qt-r4K"/>
                                 </constraints>
                                 <connections>
+                                    <outlet property="loadImageActivityIndicator" destination="VCX-aZ-SuJ" id="xHc-KL-b4K"/>
                                     <outlet property="locationImage" destination="LwA-s5-nqN" id="jTt-Nh-l9Z"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>
+                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="PhotoAlbumHeader" id="Oth-GN-HF9" customClass="PhotoAlbumHeaderCollectionReusableView" customModule="Virtual_Tourist" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="64" width="600" height="50"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <subviews>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IIw-LE-INW">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="50"/>
+                                </imageView>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="IIw-LE-INW" firstAttribute="top" secondItem="Oth-GN-HF9" secondAttribute="topMargin" constant="-8" id="2F7-1b-zix"/>
+                                <constraint firstItem="IIw-LE-INW" firstAttribute="leading" secondItem="Oth-GN-HF9" secondAttribute="leadingMargin" constant="-8" id="KP9-vg-dLw"/>
+                                <constraint firstAttribute="bottomMargin" secondItem="IIw-LE-INW" secondAttribute="bottom" constant="-8" id="QfR-k1-7GC"/>
+                                <constraint firstAttribute="trailingMargin" secondItem="IIw-LE-INW" secondAttribute="trailing" constant="-8" id="ts2-DF-pZ0"/>
+                            </constraints>
+                            <connections>
+                                <outlet property="sectionHeaderImage" destination="IIw-LE-INW" id="2v6-h2-TrC"/>
+                            </connections>
+                        </collectionReusableView>
                         <connections>
                             <outlet property="dataSource" destination="HuT-P5-jGB" id="yaV-nH-D3X"/>
                             <outlet property="delegate" destination="HuT-P5-jGB" id="ur1-BN-y3U"/>
                         </connections>
                     </collectionView>
-                    <navigationItem key="navigationItem" title="Title" id="gxg-Ug-aC2">
-                        <barButtonItem key="leftBarButtonItem" title="&lt; Back" id="Qbj-Rw-kXf">
+                    <toolbarItems>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="du5-kp-MV7"/>
+                        <barButtonItem title="New Collection" id="Yj6-jN-mRF">
                             <connections>
-                                <action selector="goBack:" destination="HuT-P5-jGB" id="5dk-T7-0zu"/>
+                                <action selector="getNewPhotoCollection:" destination="HuT-P5-jGB" id="X6U-1t-G0G"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="cancel" id="BGG-ZR-1Ce"/>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="AEM-R8-Mqy"/>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="What's happening?" id="gxg-Ug-aC2">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="ECZ-yX-9V1"/>
                     </navigationItem>
+                    <connections>
+                        <outlet property="photoCollectionView" destination="ylO-Fg-QAs" id="JS4-in-dYy"/>
+                    </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kHg-qO-LAU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1707" y="332"/>
+            <point key="canvasLocation" x="2509" y="171"/>
         </scene>
         <!--Navigation Controller-->
-        <scene sceneID="a4K-Zx-9go">
+        <scene sceneID="zsa-31-8jc">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="HpO-iX-pLD" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="PWS-Vs-ESf" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="xPL-Xb-8Oy" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="2YW-sz-ECx">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="3Ie-tZ-EUz">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="qLV-gq-NnU">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
-                        <segue destination="HuT-P5-jGB" kind="relationship" relationship="rootViewController" id="udi-l8-lap"/>
+                        <segue destination="vXZ-lx-hvc" kind="relationship" relationship="rootViewController" id="g5k-cn-Ihg"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ph3-IM-EI0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1027" y="332"/>
+            <point key="canvasLocation" x="962" y="171"/>
         </scene>
     </scenes>
 </document>
