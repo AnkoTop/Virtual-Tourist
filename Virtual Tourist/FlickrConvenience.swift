@@ -13,16 +13,20 @@ extension FlickrClient {
     
     
     func getPhotoFromUrl(photo: Photo) {
-        let imageURL = NSURL(string: photo.localFilePath)
-        if let imageData = NSData(contentsOfURL: imageURL!) {
-            photo.image = imageData
-       //     println("savecontext image")
-            CoreDataStackManager.sharedInstance().saveContext()
+        //Make sure the photo is not deleted in the meantime!
+        if !(photo.managedObjectContext == nil) {
+            let imageURL = NSURL(string: photo.localFilePath)
+            if let imageData = NSData(contentsOfURL: imageURL!) {
+                if !(photo.managedObjectContext == nil) {
+                    photo.image = imageData
+                    CoreDataStackManager.sharedInstance().saveContext()
+                }
+            }
         }
         
     }
     
-    func renewImagesForLocation (location: TravelLocation, completionHandler: (succes:Bool, message: String, error: NSError?) -> Void) {
+    func deleteImagesForLocation (location: TravelLocation, completionHandler: (succes:Bool, message: String, error: NSError?) -> Void) {
         for photo in location.photos! {
             sharedContext.deleteObject(photo)
             CoreDataStackManager.sharedInstance().saveContext()
@@ -30,6 +34,7 @@ extension FlickrClient {
         
         completionHandler(succes: true, message: "all photo's are deleted", error: nil)
     }
+    
     
     func getImagesForLocation(location: TravelLocation, completionHandler: (succes:Bool, message: String, error: NSError?) -> Void) {
         //create bbox from the coordinates
@@ -88,31 +93,19 @@ extension FlickrClient {
                     }
                     if totalPhotosVal > 0 {
                         if let photosArray = photosDictionary["photo"] as? [[String: AnyObject]] {
-                            
-                            //self.privateQueueContext.performBlock() {
+                        
                             for photo in photosArray {
-                                //println(photo["url_m"])
                                 let imageUrlString = photo["url_m"] as? String
                                 
                                 var newPhoto =  Photo(localFileName: photo["url_m"] as! String, travelLocation: location, context: self.sharedContext)
-                          //      println("saveContext insert")
                                 CoreDataStackManager.sharedInstance().saveContext()
-                                
-//                                let qos = Int(QOS_CLASS_USER_INITIATED.value)
-//                                dispatch_async(dispatch_get_global_queue(qos, 0)) {
-                                 //self.getPhotoFromUrl(newPhoto)
-//                                }
-//                                let imageURL = NSURL(string: imageUrlString!)
-//                                if let imageData = NSData(contentsOfURL: imageURL!) {
-//                                    var newPhoto =  Photo(localFileName: photo["url_m"] as! String, imageForLoc:imageData ,travelLocation: location, context: self.sharedContext)
-//                                }
+                            
                             }
-//                            println("just before saveContext")
-//                            CoreDataStackManager.sharedInstance().saveContext()
-                            //  }
-                        }
+                         completionHandler(succes: true, message: "", error: error)
+                        } else {
                         
-                        completionHandler(succes: true, message: "", error: error)
+                        completionHandler(succes: false, message: "No photos found", error: error)
+                        }
                     }
                 }
             }

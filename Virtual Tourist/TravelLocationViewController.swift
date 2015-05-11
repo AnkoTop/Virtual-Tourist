@@ -21,9 +21,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
        override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
-        
+       
         //restore MapView from last session
         restoreMapRegion(false)
         
@@ -49,6 +47,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         self.navigationController?.toolbarHidden = true
     }
     
+    
     // MARK: - Drop pin on map
     
     func dropPinOnMap(gestureRecognizer : UIGestureRecognizer) {
@@ -67,15 +66,23 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
             
                 if error == nil {
                     let placemark = CLPlacemark(placemark: placemarks[0] as! CLPlacemark)
-                    //var subthoroughfare = placemark.subThoroughfare != nil ? placemark.subThoroughfare : ""
-                    //var thoroughfare = placemark.thoroughfare != nil ? placemark.thoroughfare : ""
                     var city = placemark.subAdministrativeArea != nil ? placemark.subAdministrativeArea : ""
                     var state = placemark.administrativeArea != nil ? placemark.administrativeArea : ""
                     var country = placemark.country != nil ? placemark.country : ""
-                    //var title = "\(subthoroughfare) \(thoroughfare)"
-                    //var subTitle = "\(city),\(state)"
                     var title = "\(city) - \(state)"
                     var subTitle = "\(country)"
+                    if city == "" {
+                        if state == "" {
+                            title = ""
+                        } else {
+                            title = "\(state)"
+                        }
+                    } else {
+                        if state == "" {
+                            title = "\(city)"
+                        }
+                    }
+                    
                 
                     var annotation = MKPointAnnotation()
                     annotation.coordinate = location
@@ -83,14 +90,14 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
                     annotation.subtitle = subTitle
                     self.mapView.addAnnotation(annotation)
    
-                     //save to core data
+                    //save to core data
                     let newLocation = TravelLocation(annotation: annotation, context: self.sharedContext)
                     self.locations.append(newLocation)
                     CoreDataStackManager.sharedInstance().saveContext()
                     
-                    // Test the flickr api
+                    // get a set of images for this location
                     FlickrClient.sharedInstance().getImagesForLocation(newLocation) {succes, message, error in
-                        //do what?
+                        // ????
                     }
                 }
             })
@@ -116,7 +123,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
             //pinView!.draggable = true
             pinView!.pinColor = .Purple
             
-            //delete button on the left side
+            //add a delete button on the left side
             let buttonDelete = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
             buttonDelete.setBackgroundImage(UIImage(named: "trash"), forState: .Normal)
             buttonDelete.tintColor = UIColor.clearColor()
@@ -132,7 +139,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         return pinView
     }
 
-    //Handle the buttonactions of the pin
+    //Handle the buttonactions of the pin annotation
     func mapView(mapView: MKMapView!, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         
         for location in locations {
@@ -144,14 +151,14 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
             }
         }
         self.currentPinView = annotationView
-        // either delete the location or show its photos
-        if control == annotationView.leftCalloutAccessoryView {
+        
+        if control == annotationView.leftCalloutAccessoryView {// delete button tapped
             sharedContext.deleteObject(selectedLocation)
             CoreDataStackManager.sharedInstance().saveContext()
             self.mapView.removeAnnotation(annotationView.annotation)
-        } else if control == annotationView.rightCalloutAccessoryView {
-            // segue to the collection view
-            performSegueWithIdentifier("showPhotoAlbum", sender: self)
+        } else if control == annotationView.rightCalloutAccessoryView {// info button tapped
+            
+            performSegueWithIdentifier("showPhotoAlbum", sender: self) // segue to the collection view
         }
     }
     
@@ -160,20 +167,18 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
-        //println("prepareForSegue : \(segue.identifier)")
-    
-        if segue.identifier == "showPhotoAlbum" {
+       if segue.identifier == "showPhotoAlbum" {
             let controller = segue.destinationViewController as! PhotoAlbumCollectionViewController
         
-            //take a snapshot from the location as headerimage for the collectionview
-            controller.headerImage = takeSnapShotOfLocation()
+            //send a snapshot from the selected location as a headerimage for the collectionview
+            controller.headerImage = takeSnapshotOfLocation()
             
             // set the location for the photos to be shown
             controller.location = selectedLocation
         }
     }
     
-    func takeSnapShotOfLocation() -> UIImage {
+    func takeSnapshotOfLocation() -> UIImage {
         
         let contextSize = CGSize(width: self.view.frame.width, height: self.view.frame.height/10)
         
@@ -191,7 +196,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     }
     
     
-    // MARK: - Core Data: use the basic version, the fetchedresultcontroller has no added value for TravelLocations
+    // MARK: - Core Data: use the basic version (the fetchedresultcontroller has no added value for TravelLocations)
     
     var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
@@ -203,6 +208,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         let results = sharedContext.executeFetchRequest(fetchRequest, error: &error)
         
         if let error = error {
+            // XXXX  ADD MESSAGE
             println("Error in fectchAllTravelLocations(): \(error)")
         }
         return results as! [TravelLocation]
