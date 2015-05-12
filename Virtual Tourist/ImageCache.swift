@@ -1,15 +1,16 @@
 //
-//  ImageFileHandler.swift
-//  Virtual Tourist
+//  File.swift
+//  FavoriteActors
 //
-//  Created by Anko Top on 07/05/15.
-//  Copyright (c) 2015 Anko Top. All rights reserved.
+//  Created by Jason on 1/31/15.
+//  Copyright (c) 2015 Udacity. All rights reserved.
 //
 
 import UIKit
 
-
-class ImageFileHandler {
+class ImageCache {
+    
+    private var inMemoryCache = NSCache()
     
     // MARK: - Retreiving images
     
@@ -23,7 +24,11 @@ class ImageFileHandler {
         let path = pathForIdentifier(identifier!)
         var data: NSData?
         
-            
+        // First try the memory cache
+        if let image = inMemoryCache.objectForKey(path) as? UIImage {
+            return image
+        }
+        
         // Next Try the hard drive
         if let data = NSData(contentsOfFile: path) {
             return UIImage(data: data)
@@ -35,20 +40,26 @@ class ImageFileHandler {
     // MARK: - Saving images
     
     func storeImage(image: UIImage?, withIdentifier identifier: String) {
+        
         let path = pathForIdentifier(identifier)
         
-        // If the image is nil, remove images from the cache
-        if image == nil {
-    
-            NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
-            return
-        }
-        
+        // Otherwise, keep the image in memory
+        inMemoryCache.setObject(image!, forKey: path)
         
         // And in documents directory
-        let data = UIImagePNGRepresentation(image!)
+        let data = UIImageJPEGRepresentation(image!, 1)
         data.writeToFile(path, atomically: true)
     }
+    
+    // MARK: - Delete images
+    func deleteImage(identifier: String) {
+        
+        let path = pathForIdentifier(identifier)
+
+        inMemoryCache.removeObjectForKey(path)
+        NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+    }
+    
     
     // MARK: - Helper
     
@@ -58,6 +69,4 @@ class ImageFileHandler {
         
         return fullURL.path!
     }
-
-
 }

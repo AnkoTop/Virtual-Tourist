@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 @objc(Photo)
 
@@ -15,9 +16,32 @@ import CoreData
 class Photo: NSManagedObject {
     
     @NSManaged var creation : NSDate
-    @NSManaged var localFilePath : String
-    @NSManaged var image : NSData?
+    @NSManaged var remoteFilePath : String
+    @NSManaged var localFilePath : String?
     @NSManaged var location : TravelLocation
+    
+    override func willSave() {
+
+        if self.deleted {
+            if localFilePath != nil {
+                FlickrClient.Caches.imageCache.deleteImage(localFilePath!)
+            }
+        }
+    }
+    
+    var localImage: UIImage? {
+        
+        get {
+            
+            return FlickrClient.Caches.imageCache.imageWithIdentifier(localFilePath)
+        }
+        
+        set {
+            
+            FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: localFilePath!)
+        }
+        
+    }
     
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -25,33 +49,32 @@ class Photo: NSManagedObject {
     }
     
     // full init
-    init(localFileName: String, imageForLoc: NSData, travelLocation: TravelLocation, context: NSManagedObjectContext){
+    init(remoteFileName: String, localFilename: String, travelLocation: TravelLocation, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         creation = NSDate()
-        localFilePath = localFileName
-        image = imageForLoc
+        remoteFilePath = remoteFileName
+        localFilePath = localFilename
         location = travelLocation
         
     }
     
-    // init without downloaded phot0
-    init(localFileName: String, travelLocation: TravelLocation, context: NSManagedObjectContext){
+    // init without downloaded photo
+    init(remoteFileName: String, travelLocation: TravelLocation, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         creation = NSDate()
-        localFilePath = localFileName
+        remoteFilePath = remoteFileName
+        
+        // make a unique key for the image
+        let locationIdentifier = String(stringInterpolationSegment: travelLocation.latitude) + String(stringInterpolationSegment: travelLocation.longitude)
+        var indexOfSlash = remoteFilePath.rangeOfString("/", options: .BackwardsSearch)?.startIndex
+        localFilePath =  locationIdentifier + remoteFilePath.substringFromIndex(advance(indexOfSlash!, 1))
+
         location = travelLocation
         
     }
 
-    
-    // manage the filehandling here so we can always change the way we store images
-    
-    func deleteLocalPhotoFile() {
-        // TO DO: delete the file from the directory
-    }    
-    
 }

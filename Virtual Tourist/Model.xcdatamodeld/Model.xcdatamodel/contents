@@ -2,8 +2,8 @@
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7549" systemVersion="14D136" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Photo" representedClassName="Photo" syncable="YES">
         <attribute name="creation" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="image" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="localFilePath" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="remoteFilePath" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="location" maxCount="1" deletionRule="Nullify" destinationEntity="TravelLocation" inverseName="photos" inverseEntity="TravelLocation" syncable="YES"/>
     </entity>
     <entity name="TravelLocation" representedClassName="TravelLocation" syncable="YES">

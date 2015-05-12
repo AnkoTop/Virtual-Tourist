@@ -15,7 +15,10 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     
     // will be set before segue from the mapView
     var location: TravelLocation!
+    var currentPhoto: Photo!
     var headerImage : UIImage!
+
+    
     
     @IBOutlet var photoCollectionView: UICollectionView!
     //@IBOutlet weak var imageForCell: UIImageView!
@@ -23,6 +26,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -30,7 +34,6 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         
         self.navigationController?.navigationBarHidden = false
         self.navigationController?.toolbarHidden = true
-        //println("Photo: viewWillAppear")
         
         // Fetch the results from coredata
         fetchedResultsController.performFetch(nil)
@@ -38,13 +41,12 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         // check for empty images
         let qos = Int(DISPATCH_QUEUE_PRIORITY_BACKGROUND.value)
         dispatch_async(dispatch_get_global_queue(qos, 0)) {
-         for photo in self.location.photos! {
-            if photo.image == nil {
-                 FlickrClient.sharedInstance().getPhotoFromUrl(photo)
-     //            println("nsdata empty: get the picture")
-             }
+            for photo in self.location.photos! {
+                if photo.localImage == nil {
+                    FlickrClient.sharedInstance().getPhotoFromUrlFor(self.location, photo: photo)
+                }
+            }
         }
-         }
       //  println("view will appear # fetched : \(fetchedResultsController.fetchedObjects!.count)")
         if fetchedResultsController.fetchedObjects!.count > 0 {
           self.navigationController?.toolbarHidden = false
@@ -68,9 +70,8 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
                     let qos = Int(DISPATCH_QUEUE_PRIORITY_HIGH.value)
                     dispatch_async(dispatch_get_global_queue(qos, 0)) {
                         for photo in self.location.photos! {
-                            if photo.image == nil {
-                                FlickrClient.sharedInstance().getPhotoFromUrl(photo)
-                            }
+                            if photo.localImage == nil {
+                                FlickrClient.sharedInstance().getPhotoFromUrlFor(self.location, photo: photo)                            }
                         }
                     }
                 }
@@ -129,23 +130,55 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! PhotoAlbumUICollectionViewCell
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         // check if we have an image or have to show a placeholder
-        if photo.image != nil {
-            cell.locationImage.image = UIImage(data: photo.image!)
+        if photo.localImage != nil {
+            //cell.locationImage.image = UIImage(data: photo.image!)
+            cell.locationImage.image = photo.localImage
             cell.loadImageActivityIndicator.stopAnimating()
         } else {
             cell.locationImage.image = UIImage(named: "placeHolder")
             cell.loadImageActivityIndicator.startAnimating()
         }
         
+        //add tap recognizer to show details
+        let singleTap = UITapGestureRecognizer(target: self, action: Selector("showImageDetails:"))
+        
+        singleTap.numberOfTapsRequired = 1
+        cell.addGestureRecognizer(singleTap)
+        
         //add doubletap recognizer to delete
         let doubleTap = UITapGestureRecognizer(target: self, action: Selector("removeFromCollection:"))
         doubleTap.numberOfTapsRequired = 2
         cell.addGestureRecognizer(doubleTap)
+        
+        singleTap.requireGestureRecognizerToFail(doubleTap)
   
         return cell
     }
     
+    func showImageDetails (gestureRecognizer : UIGestureRecognizer) {
+        if let indexPath = self.collectionView?.indexPathForCell(gestureRecognizer.view as! PhotoAlbumUICollectionViewCell) {
+            if let photo = fetchedResultsController.objectAtIndexPath(indexPath) as? Photo {
+                currentPhoto = photo
+                if photo.localImage != nil {
+                    performSegueWithIdentifier("showImageDetails", sender: self) // segue to imagedetails
+                }
+            }
+        }
+    }
+        
+        
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        if segue.identifier == "showImageDetails" {
+            let controller = segue.destinationViewController as! ImageDetailsViewController
+             controller.photo = currentPhoto    
+        }
+    }
+
+    
     func removeFromCollection(gestureRecognizer : UIGestureRecognizer){
+        println("in remove from collection")
         if let indexPath = self.collectionView?.indexPathForCell(gestureRecognizer.view as! PhotoAlbumUICollectionViewCell) {
             let photoForDelete = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
             sharedContext.deleteObject(photoForDelete)
@@ -167,38 +200,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
             return header!
     }
 
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(collectionView: UICollectionView, shouldHighlightItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(collectionView: UICollectionView, shouldShowMenuForItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(collectionView: UICollectionView, canPerformAction action: Selector, forItemAtIndexPath indexPath: NSIndexPath, withSender sender: AnyObject?) -> Bool {
-        return false
-    }
-
-    override func collectionView(collectionView: UICollectionView, performAction action: Selector, forItemAtIndexPath indexPath: NSIndexPath, withSender sender: AnyObject?) {
-    
-    }
-    */
-    
-    
+       
     // MARK: UICollectionViewDelegateFlowLayout
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         
@@ -263,10 +265,11 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
                 self.photoCollectionView.deleteItemsAtIndexPaths([indexPath!])
             case .Update:
                 // image updated: refresh it
-                if changedPhoto.image != nil {
+                if changedPhoto.localImage != nil {
                     dispatch_async(dispatch_get_main_queue()) {
                         if let cell = self.photoCollectionView.cellForItemAtIndexPath(indexPath!) as? PhotoAlbumUICollectionViewCell {
-                            cell.locationImage.image = UIImage(data: changedPhoto.image!)
+                           // cell.locationImage.image = UIImage(data: changedPhoto.image!)
+                            cell.locationImage.image = changedPhoto.localImage!
                             cell.loadImageActivityIndicator.stopAnimating()
                         }
                     }

@@ -7,18 +7,21 @@
 //
 
 import Foundation
+import UIKit
 import CoreData
 
 extension FlickrClient {
     
     
-    func getPhotoFromUrl(photo: Photo) {
+    func getPhotoFromUrlFor(location: TravelLocation, photo: Photo) {
         //Make sure the photo is not deleted in the meantime!
         if !(photo.managedObjectContext == nil) {
-            let imageURL = NSURL(string: photo.localFilePath)
+            let imageURL = NSURL(string: photo.remoteFilePath)
             if let imageData = NSData(contentsOfURL: imageURL!) {
                 if !(photo.managedObjectContext == nil) {
-                    photo.image = imageData
+                    photo.localImage = UIImage(data: imageData)
+                    let trick = photo.localFilePath
+                    photo.localFilePath =  trick
                     CoreDataStackManager.sharedInstance().saveContext()
                 }
             }
@@ -64,7 +67,6 @@ extension FlickrClient {
                 completionHandler(succes: false, message: "Error in Network connection", error: error)
             } else {
                if let photosDictionary = JSONResult.valueForKey("photos") as? [String:AnyObject] {
-                    //println("photodictionary: \(photosDictionary)")
                 
                     if let totalPages = photosDictionary["pages"] as? Int {
                         let pageLimit = min(totalPages, Constants.perPage)
@@ -97,7 +99,7 @@ extension FlickrClient {
                             for photo in photosArray {
                                 let imageUrlString = photo["url_m"] as? String
                                 
-                                var newPhoto =  Photo(localFileName: photo["url_m"] as! String, travelLocation: location, context: self.sharedContext)
+                                var newPhoto =  Photo(remoteFileName: photo["url_m"] as! String, travelLocation: location, context: self.sharedContext)
                                 CoreDataStackManager.sharedInstance().saveContext()
                             
                             }
