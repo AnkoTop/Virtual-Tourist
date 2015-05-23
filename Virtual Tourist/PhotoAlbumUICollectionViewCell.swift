@@ -11,7 +11,6 @@ import UIKit
 class PhotoAlbumUICollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var locationImage: UIImageView!
-    
     @IBOutlet weak var loadImageActivityIndicator: UIActivityIndicatorView!
     
 }

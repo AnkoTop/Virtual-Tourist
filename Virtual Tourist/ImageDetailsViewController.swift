@@ -10,14 +10,15 @@ import UIKit
 
 class ImageDetailsViewController: UIViewController {
 
+    // must be set by the prepareForSegue
     var photo: Photo!
+    
     @IBOutlet weak var detailImage: UIImageView!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
     }
 
     
@@ -26,17 +27,7 @@ class ImageDetailsViewController: UIViewController {
        
         self.navigationController?.toolbarHidden = true
         detailImage.image = photo.localImage
-        //detailImage.image = UIImage(data: imageData)
+        
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

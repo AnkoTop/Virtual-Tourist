@@ -160,7 +160,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
             if let photo = fetchedResultsController.objectAtIndexPath(indexPath) as? Photo {
                 currentPhoto = photo
                 if photo.localImage != nil {
-                    performSegueWithIdentifier("showImageDetails", sender: self) // segue to imagedetails
+                    performSegueWithIdentifier(Constants.SegueIdentifier.showImageDetails, sender: self) // segue to imagedetails
                 }
             }
         }
@@ -170,7 +170,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
-        if segue.identifier == "showImageDetails" {
+        if segue.identifier == Constants.SegueIdentifier.showImageDetails {
             let controller = segue.destinationViewController as! ImageDetailsViewController
              controller.photo = currentPhoto    
         }
@@ -178,7 +178,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
 
     
     func removeFromCollection(gestureRecognizer : UIGestureRecognizer){
-        println("in remove from collection")
+
         if let indexPath = self.collectionView?.indexPathForCell(gestureRecognizer.view as! PhotoAlbumUICollectionViewCell) {
             let photoForDelete = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
             sharedContext.deleteObject(photoForDelete)
@@ -202,10 +202,11 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
 
        
     // MARK: UICollectionViewDelegateFlowLayout
+    
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         
         // Set Item properties
-        // fit 3 foto's horizontal and adjust vertica size to 4:3 ratio
+        // fit 3 foto's horizontal and adjust vertical size to 4:3 ratio
         let spaceHorizontal = self.collectionView!.frame.width
         var size = (collectionViewLayout as! UICollectionViewFlowLayout).itemSize
         size.width = spaceHorizontal / 3
@@ -268,7 +269,6 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
                 if changedPhoto.localImage != nil {
                     dispatch_async(dispatch_get_main_queue()) {
                         if let cell = self.photoCollectionView.cellForItemAtIndexPath(indexPath!) as? PhotoAlbumUICollectionViewCell {
-                           // cell.locationImage.image = UIImage(data: changedPhoto.image!)
                             cell.locationImage.image = changedPhoto.localImage!
                             cell.loadImageActivityIndicator.stopAnimating()
                         }

@@ -24,10 +24,11 @@ class TravelLocation: NSManagedObject {
     // compute property; no need to store it in core data
     var annotation : MKPointAnnotation {
         get {
-            let newAnnotation = MKPointAnnotation()
+            let newAnnotation = MKPointAnnotationForTravelLocation()
             newAnnotation.coordinate = CLLocationCoordinate2DMake(latitude, longitude)
             newAnnotation.title = title
             newAnnotation.subtitle = subTitle
+            newAnnotation.forTravelLocation = self
             return newAnnotation
         }
     }
