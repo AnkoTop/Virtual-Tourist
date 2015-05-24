@@ -41,10 +41,10 @@ class TravelLocation: NSManagedObject {
         let entity = NSEntityDescription.entityForName("TravelLocation", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        latitude = annotation.coordinate.latitude
-        longitude = annotation.coordinate.longitude
-        title = annotation.title
-        subTitle = annotation.subtitle
+        self.latitude = annotation.coordinate.latitude
+        self.longitude = annotation.coordinate.longitude
+        self.title = annotation.title
+        self.subTitle = annotation.subtitle
     }
     
 }

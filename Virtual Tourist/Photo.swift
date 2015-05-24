@@ -21,7 +21,7 @@ class Photo: NSManagedObject {
     @NSManaged var location : TravelLocation
     
     override func willSave() {
-
+        // delete any images belonging to the location when it is deleted
         if self.deleted {
             if localFilePath != nil {
                 FlickrClient.Caches.imageCache.deleteImage(localFilePath!)
@@ -53,10 +53,10 @@ class Photo: NSManagedObject {
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        creation = NSDate()
-        remoteFilePath = remoteFileName
-        localFilePath = localFilename
-        location = travelLocation
+        self.creation = NSDate()
+        self.remoteFilePath = remoteFileName
+        self.localFilePath = localFilename
+        self.location = travelLocation
         
     }
     
@@ -65,15 +65,15 @@ class Photo: NSManagedObject {
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        creation = NSDate()
-        remoteFilePath = remoteFileName
+        self.creation = NSDate()
+        self.remoteFilePath = remoteFileName
         
         // make a unique key for the image
         let locationIdentifier = String(stringInterpolationSegment: travelLocation.latitude) + String(stringInterpolationSegment: travelLocation.longitude)
         var indexOfSlash = remoteFilePath.rangeOfString("/", options: .BackwardsSearch)?.startIndex
-        localFilePath =  locationIdentifier + remoteFilePath.substringFromIndex(advance(indexOfSlash!, 1))
+        self.localFilePath =  locationIdentifier + remoteFilePath.substringFromIndex(advance(indexOfSlash!, 1))
 
-        location = travelLocation
+        self.location = travelLocation
         
     }
 

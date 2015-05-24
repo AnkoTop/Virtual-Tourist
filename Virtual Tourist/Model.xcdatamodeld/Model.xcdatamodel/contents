@@ -6,15 +6,21 @@
         <attribute name="remoteFilePath" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="location" maxCount="1" deletionRule="Nullify" destinationEntity="TravelLocation" inverseName="photos" inverseEntity="TravelLocation" syncable="YES"/>
     </entity>
+    <entity name="Tag" representedClassName="Tag" syncable="YES">
+        <attribute name="keyword" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="location" maxCount="1" deletionRule="Nullify" destinationEntity="TravelLocation" inverseName="tags" inverseEntity="TravelLocation" syncable="YES"/>
+    </entity>
     <entity name="TravelLocation" representedClassName="TravelLocation" syncable="YES">
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="subTitle" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Photo" inverseName="location" inverseEntity="Photo" syncable="YES"/>
+        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Tag" inverseName="location" inverseEntity="Tag" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Photo" positionX="-36" positionY="36" width="128" height="105"/>
-        <element name="TravelLocation" positionX="-54" positionY="-9" width="128" height="120"/>
+        <element name="Photo" positionX="-263" positionY="9" width="128" height="105"/>
+        <element name="TravelLocation" positionX="-504" positionY="-0" width="128" height="133"/>
+        <element name="Tag" positionX="-722" positionY="9" width="128" height="73"/>
     </elements>
 </model>

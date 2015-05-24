@@ -11,17 +11,16 @@ import CoreData
 
 let reuseIdentifier = "PhotoAlbumCell"
 
-class PhotoAlbumCollectionViewController: UICollectionViewController, UICollectionViewDataSource ,UICollectionViewDelegateFlowLayout {
+class PhotoAlbumCollectionViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,
+UIPopoverPresentationControllerDelegate {
     
     // will be set before segue from the mapView
-    var location: TravelLocation!
+    var currentLocation: TravelLocation!
     var currentPhoto: Photo!
     var headerImage : UIImage!
-
-    
+  
     
     @IBOutlet var photoCollectionView: UICollectionView!
-    //@IBOutlet weak var imageForCell: UIImageView!
     
     
     override func viewDidLoad() {
@@ -41,9 +40,9 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         // check for empty images
         let qos = Int(DISPATCH_QUEUE_PRIORITY_BACKGROUND.value)
         dispatch_async(dispatch_get_global_queue(qos, 0)) {
-            for photo in self.location.photos! {
+            for photo in self.currentLocation.photos! {
                 if photo.localImage == nil {
-                    FlickrClient.sharedInstance().getPhotoFromUrlFor(self.location, photo: photo)
+                    FlickrClient.sharedInstance().getPhotoFromUrlFor(self.currentLocation, photo: photo)
                 }
             }
         }
@@ -51,7 +50,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         if fetchedResultsController.fetchedObjects!.count > 0 {
           self.navigationController?.toolbarHidden = false
         } else {
-            FlickrClient.sharedInstance().getImagesForLocation(self.location) {succes, message, error in
+            FlickrClient.sharedInstance().getImagesForLocation(self.currentLocation) {succes, message, error in
                 //do what?
             }
         }
@@ -60,18 +59,25 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     }
     
     
+    @IBAction func showTagPopup(sender: UIBarButtonItem) {
+        // show a popup with tags
+      
+        
+    }
+    
+    
     @IBAction func getNewPhotoCollection(sender: UIBarButtonItem) {
         
-       FlickrClient.sharedInstance().deleteImagesForLocation(location) {succes, message, error in
+       FlickrClient.sharedInstance().deleteImagesForLocation(currentLocation) {succes, message, error in
             if succes {
                 // get a new batch of images
-                 FlickrClient.sharedInstance().getImagesForLocation(self.location) {succes, message, error in
+                 FlickrClient.sharedInstance().getImagesForLocation(self.currentLocation) {succes, message, error in
                     
                     let qos = Int(DISPATCH_QUEUE_PRIORITY_HIGH.value)
                     dispatch_async(dispatch_get_global_queue(qos, 0)) {
-                        for photo in self.location.photos! {
+                        for photo in self.currentLocation.photos! {
                             if photo.localImage == nil {
-                                FlickrClient.sharedInstance().getPhotoFromUrlFor(self.location, photo: photo)                            }
+                                FlickrClient.sharedInstance().getPhotoFromUrlFor(self.currentLocation, photo: photo)                            }
                         }
                     }
                 }
@@ -95,7 +101,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "creation", ascending: true)] //sort old->new
-        fetchRequest.predicate = NSPredicate(format: "location == %@", self.location); // only for the current location
+        fetchRequest.predicate = NSPredicate(format: "location == %@", self.currentLocation); // only for the current location
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
             managedObjectContext: self.sharedContext,
@@ -106,6 +112,12 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         
         }()
     
+    
+    //MARK: - popoverdelegate
+    func adaptivePresentationStyleForPresentationController(
+        controller: UIPresentationController) -> UIModalPresentationStyle {
+            return .None
+    }
     
     
     
@@ -167,12 +179,20 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     }
         
         
-    
+    // MARK: - Prepare for Segue
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        
-        if segue.identifier == Constants.SegueIdentifier.showImageDetails {
-            let controller = segue.destinationViewController as! ImageDetailsViewController
-             controller.photo = currentPhoto    
+       
+        switch segue.identifier! {
+            case Constants.SegueIdentifier.showImageDetails:
+                let controller = segue.destinationViewController as! ImageDetailsViewController
+                controller.photo = currentPhoto
+            case Constants.SegueIdentifier.showTags:
+                let popoverViewController = segue.destinationViewController as! TagCollectionViewController
+                popoverViewController.currentLocation = self.currentLocation
+                popoverViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
+                popoverViewController.popoverPresentationController!.delegate = self
+        default:
+            break
         }
     }
 

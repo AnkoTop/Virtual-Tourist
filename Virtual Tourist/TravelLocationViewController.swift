@@ -32,10 +32,14 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         }
         
         // Add longpressrecognizer to the mapView
-        let longTap: UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "dropPinOnMap:")
+        let longTap = UILongPressGestureRecognizer(target: self, action: "dropPinOnMap:")
         longTap.numberOfTapsRequired = 0
         longTap.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longTap)
+        
+        
+        //default maptype is Standard
+        mapView.mapType = .Standard
         
     }
     
@@ -45,8 +49,21 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         //always hide bars
         self.navigationController?.navigationBarHidden = true
         self.navigationController?.toolbarHidden = true
+        
+        
     }
     
+    @IBAction func toggleMapType() {
+        //set maptype to the next value
+        switch mapView.mapType {
+            case .Standard:
+                mapView.mapType = .Satellite
+            case .Satellite :
+                mapView.mapType = .Hybrid
+        case .Hybrid :
+                mapView.mapType = .Standard
+        }
+    }
     
     // MARK: - Drop pin on map
     
@@ -175,7 +192,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
             controller.headerImage = takeSnapshotOfLocation()
             
             // set the location for the photos to be shown
-            controller.location = selectedLocation
+            controller.currentLocation = selectedLocation
         }
     }
     

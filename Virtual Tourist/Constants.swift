@@ -13,7 +13,13 @@ struct Constants {
     struct SegueIdentifier {
         static let showPhotoAlbum = "showPhotoAlbum"
         static let showImageDetails = "showImageDetails"
+        static let showTags = "showTags"
     
+    }
+    
+    struct Limits {
+        static let maxNumberOfTagsForLocation = 5
+        
     }
     
 }
