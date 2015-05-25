@@ -19,7 +19,6 @@ struct Constants {
     
     struct Limits {
         static let maxNumberOfTagsForLocation = 5
-        
     }
     
 }

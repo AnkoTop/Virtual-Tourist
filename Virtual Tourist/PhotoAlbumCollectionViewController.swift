@@ -28,6 +28,7 @@ UIPopoverPresentationControllerDelegate {
         
     }
     
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
         
@@ -46,23 +47,18 @@ UIPopoverPresentationControllerDelegate {
                 }
             }
         }
-      //  println("view will appear # fetched : \(fetchedResultsController.fetchedObjects!.count)")
+    
         if fetchedResultsController.fetchedObjects!.count > 0 {
           self.navigationController?.toolbarHidden = false
         } else {
             FlickrClient.sharedInstance().getImagesForLocation(self.currentLocation) {succes, message, error in
-                //do what?
+                if !succes {
+                    self.showImageErrorWith(message)
+                }
             }
         }
 
        
-    }
-    
-    
-    @IBAction func showTagPopup(sender: UIBarButtonItem) {
-        // show a popup with tags
-      
-        
     }
     
     
@@ -82,11 +78,21 @@ UIPopoverPresentationControllerDelegate {
                     }
                 }
             } else {
-                println("that's not good")
+                self.showImageErrorWith(message)
             }
         }
-   
     }
+    
+    
+    func showImageErrorWith(message: String) {
+        // show the error
+        var composeAlert = UIAlertController(title: "Error in retrieving images", message: "Sorry, we encountered an error : \(message)", preferredStyle: UIAlertControllerStyle.Alert)
+        composeAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+            // no action
+        }))
+        self.presentViewController(composeAlert, animated: true, completion: nil)
+    }
+    
     
     // MARK: - Core Data
     
@@ -143,7 +149,6 @@ UIPopoverPresentationControllerDelegate {
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         // check if we have an image or have to show a placeholder
         if photo.localImage != nil {
-            //cell.locationImage.image = UIImage(data: photo.image!)
             cell.locationImage.image = photo.localImage
             cell.loadImageActivityIndicator.stopAnimating()
         } else {
@@ -188,6 +193,9 @@ UIPopoverPresentationControllerDelegate {
                 controller.photo = currentPhoto
             case Constants.SegueIdentifier.showTags:
                 let popoverViewController = segue.destinationViewController as! TagCollectionViewController
+                
+                
+                
                 popoverViewController.currentLocation = self.currentLocation
                 popoverViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
                 popoverViewController.popoverPresentationController!.delegate = self
@@ -205,6 +213,7 @@ UIPopoverPresentationControllerDelegate {
             CoreDataStackManager.sharedInstance().saveContext()
         }
     }
+    
     
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath)
         -> UICollectionReusableView {
@@ -225,7 +234,6 @@ UIPopoverPresentationControllerDelegate {
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         
-        // Set Item properties
         // fit 3 foto's horizontal and adjust vertical size to 4:3 ratio
         let spaceHorizontal = self.collectionView!.frame.width
         var size = (collectionViewLayout as! UICollectionViewFlowLayout).itemSize
@@ -234,7 +242,6 @@ UIPopoverPresentationControllerDelegate {
         
         return size
     }
-    
     
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -253,7 +260,7 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
     
     
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
-       // println("WillChangeContent")
+       // not implemented
     }
 
     
@@ -304,7 +311,7 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
     }
 
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
- //       println("DidChangeContent")
+        //  not implemented
    }
     
 }

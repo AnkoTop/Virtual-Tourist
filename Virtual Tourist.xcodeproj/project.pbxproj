@@ -10,7 +10,6 @@
 		A43507511B01EA8B002BD952 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43507501B01EA8B002BD952 /* ImageCache.swift */; };
 		A447A1E61AF78B93001E734A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A1E51AF78B93001E734A /* AppDelegate.swift */; };
 		A447A1EB1AF78B93001E734A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A447A1E91AF78B93001E734A /* Main.storyboard */; };
-		A447A1ED1AF78B93001E734A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A447A1EC1AF78B93001E734A /* Images.xcassets */; };
 		A447A1F01AF78B93001E734A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A447A1EE1AF78B93001E734A /* LaunchScreen.xib */; };
 		A447A1FC1AF78B94001E734A /* Virtual_TouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A1FB1AF78B94001E734A /* Virtual_TouristTests.swift */; };
 		A447A2071AF78BE4001E734A /* TravelLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A2061AF78BE4001E734A /* TravelLocation.swift */; };
@@ -26,6 +25,7 @@
 		A47DE74F1AFDEA5C0065B96F /* FlickrConvenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47DE74E1AFDEA5C0065B96F /* FlickrConvenience.swift */; };
 		A47DE7511B00CC950065B96F /* ImageDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47DE7501B00CC950065B96F /* ImageDetailsViewController.swift */; };
 		A47DE7531B00F4B50065B96F /* TagCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47DE7521B00F4B50065B96F /* TagCollectionViewController.swift */; };
+		A486A03B1B13385F002CE6B8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A486A03A1B13385E002CE6B8 /* Images.xcassets */; };
 		A498A65D1B0FD087001CB000 /* MKPointAnnotationForTravelLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A498A65C1B0FD087001CB000 /* MKPointAnnotationForTravelLocation.swift */; };
 		A498A65F1B108CAB001CB000 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A498A65E1B108CAB001CB000 /* Constants.swift */; };
 		A498A6611B1108E6001CB000 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A498A6601B1108E6001CB000 /* Tag.swift */; };
@@ -48,7 +48,6 @@
 		A447A1E41AF78B93001E734A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A447A1E51AF78B93001E734A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A447A1EA1AF78B93001E734A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		A447A1EC1AF78B93001E734A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A447A1EF1AF78B93001E734A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		A447A1F51AF78B94001E734A /* Virtual TouristTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Virtual TouristTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A447A1FA1AF78B94001E734A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -66,6 +65,7 @@
 		A47DE74E1AFDEA5C0065B96F /* FlickrConvenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConvenience.swift; sourceTree = "<group>"; };
 		A47DE7501B00CC950065B96F /* ImageDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDetailsViewController.swift; sourceTree = "<group>"; };
 		A47DE7521B00F4B50065B96F /* TagCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagCollectionViewController.swift; sourceTree = "<group>"; };
+		A486A03A1B13385E002CE6B8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A498A65C1B0FD087001CB000 /* MKPointAnnotationForTravelLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKPointAnnotationForTravelLocation.swift; sourceTree = "<group>"; };
 		A498A65E1B108CAB001CB000 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		A498A6601B1108E6001CB000 /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
@@ -124,7 +124,7 @@
 		A447A1E31AF78B93001E734A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				A447A1EC1AF78B93001E734A /* Images.xcassets */,
+				A486A03A1B13385E002CE6B8 /* Images.xcassets */,
 				A447A1E41AF78B93001E734A /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -275,9 +275,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A486A03B1B13385F002CE6B8 /* Images.xcassets in Resources */,
 				A447A1EB1AF78B93001E734A /* Main.storyboard in Resources */,
 				A447A1F01AF78B93001E734A /* LaunchScreen.xib in Resources */,
-				A447A1ED1AF78B93001E734A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

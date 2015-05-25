@@ -13,7 +13,7 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
 
     
     // must be set by segue
-    var currentLocation : TravelLocation?
+    var currentLocation : TravelLocation!
     
     // outlets
     @IBOutlet weak var tagCollectionView: UICollectionView!
@@ -33,6 +33,12 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
         tagCollectionView.delegate = self
         tagCollectionView.dataSource = self
         keywordText.delegate = self
+        
+        addButton.setTitleColor(UIColor.grayColor(), forState: .Disabled)
+        addButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        deleteButton.setTitleColor(UIColor.grayColor(), forState: .Disabled)
+        deleteButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+
     }
 
     
@@ -68,6 +74,8 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
         sharedContext.deleteObject(self.selectedTag!)
         CoreDataStackManager.sharedInstance().saveContext()
         
+        deleteButton.enabled = false
+        
     }
     
     
@@ -75,9 +83,9 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
     
         keywordText.resignFirstResponder()
         
-        if keywordText != "" {
+        if keywordText.text != "" {
             //add to coredata
-            let newTag = Tag(keyword: keywordText.text, travelLocation: currentLocation!, context: sharedContext)
+            let newTag = Tag(keyword: keywordText.text, travelLocation: currentLocation, context: sharedContext)
             CoreDataStackManager.sharedInstance().saveContext()
             
             // add to currentTags & refresh collection
@@ -182,12 +190,20 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
     func fetchAllTags() -> [Tag] {
         var error: NSError?
         let fetchRequest = NSFetchRequest(entityName: "Tag")
+        fetchRequest.predicate = NSPredicate(format: "location == %@", self.currentLocation); // only for the current location
+
         let results = sharedContext.executeFetchRequest(fetchRequest, error: &error)
         
+        // check for errors
         if let error = error {
-            // XXXX  ADD MESSAGE
-            println("Error in fectchAllTags(): \(error)")
+            var composeAlert = UIAlertController(title: "Error in retrieving tags", message: "Sorry, we encountered this error : \(error)", preferredStyle: UIAlertControllerStyle.Alert)
+            composeAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+                //
+                
+            }))
+            presentViewController(composeAlert, animated: true, completion: nil)
         }
+        
         return results as! [Tag]
     }
     

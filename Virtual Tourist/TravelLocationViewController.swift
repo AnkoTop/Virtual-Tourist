@@ -19,6 +19,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
     var locations = [TravelLocation]()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
        
@@ -35,13 +36,14 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         let longTap = UILongPressGestureRecognizer(target: self, action: "dropPinOnMap:")
         longTap.numberOfTapsRequired = 0
         longTap.minimumPressDuration = 0.5
+        longTap.allowableMovement = 100.0
         mapView.addGestureRecognizer(longTap)
-        
-        
+       
         //default maptype is Standard
         mapView.mapType = .Standard
         
     }
+    
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
@@ -49,9 +51,8 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         //always hide bars
         self.navigationController?.navigationBarHidden = true
         self.navigationController?.toolbarHidden = true
-        
-        
     }
+    
     
     @IBAction func toggleMapType() {
         //set maptype to the next value
@@ -65,6 +66,8 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         }
     }
     
+    
+    
     // MARK: - Drop pin on map
     
     func dropPinOnMap(longtapRecognizer : UIGestureRecognizer) {
@@ -72,12 +75,10 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         if (longtapRecognizer.state) == .Began {
             let tapPoint: CGPoint = longtapRecognizer.locationInView(mapView)
             let touchMapCoordinate: CLLocationCoordinate2D = mapView.convertPoint(tapPoint, toCoordinateFromView: mapView)
-                
             var coordinate = mapView.convertPoint(tapPoint, toCoordinateFromView: self.mapView)
-        var location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+            var location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         
             CLGeocoder().reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
-            
                 if error == nil {
                     let placemark = CLPlacemark(placemark: placemarks[0] as! CLPlacemark)
                     var city = placemark.subAdministrativeArea != nil ? placemark.subAdministrativeArea : ""
@@ -86,35 +87,18 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
                     var title = "\(city) - \(state)"
                     var subTitle = "\(country)"
                     if city == "" {
-                        if state == "" {
-                            title = ""
-                        } else {
-                            title = "\(state)"
-                        }
+                        if state == "" { title = ""
+                        } else { title = "\(state)" }
                     } else {
-                        if state == "" {
-                            title = "\(city)"
-                        }
+                        if state == "" { title = "\(city)" }
                     }
                     
-                
-                    var annotation = MKPointAnnotationForTravelLocation()
+                    // make it a normal dragable notation
+                    var annotation = MKPointAnnotation()
                     annotation.coordinate = location.coordinate
                     annotation.title = title
                     annotation.subtitle = subTitle
-                    
-                    //save to core data
-                    let newLocation = TravelLocation(annotation: annotation, context: self.sharedContext)
-                    self.locations.append(newLocation)
-                    CoreDataStackManager.sharedInstance().saveContext()
-                    
-                    annotation.forTravelLocation = newLocation
                     self.mapView.addAnnotation(annotation)
-
-                    // get a set of images for this location
-                    FlickrClient.sharedInstance().getImagesForLocation(newLocation) {succes, message, error in
-                        // ????
-                    }
                 }
             })
         }
@@ -130,29 +114,49 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
     
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
-        let reuseIdForPin = "pin"
-        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdForPin) as? MKPinAnnotationView
         
-        if pinView == nil {
-            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdForPin)
-            pinView!.canShowCallout = true
-            pinView!.draggable = true
-            pinView!.pinColor = .Purple
-    
-            //add a delete button on the left side
-            let buttonDelete = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
-            buttonDelete.setBackgroundImage(UIImage(named: "trash"), forState: .Normal)
-            buttonDelete.tintColor = UIColor.clearColor()
-            pinView!.leftCalloutAccessoryView = buttonDelete
-            //and the information button on the right
-            let buttonInformation = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
-            pinView!.rightCalloutAccessoryView = buttonInformation
-        } else {
-            pinView!.annotation = annotation
-        }
-        
-        return pinView
+        // different pinview atrributes for different types of annotations
+        if let anno = annotation as? MKPointAnnotationForTravelLocation {
+            let reuseIdForPin = "pin"
+            var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdForPin) as? MKPinAnnotationView
+            
+            if pinView == nil {
+                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdForPin)
+                pinView!.canShowCallout = true
+                pinView!.draggable = false
+                pinView!.pinColor = .Red
+                
+                //add a delete button on the left side
+                let buttonDelete = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+                buttonDelete.setBackgroundImage(UIImage(named: "trash"), forState: .Normal)
+                buttonDelete.tintColor = UIColor.clearColor()
+                pinView!.leftCalloutAccessoryView = buttonDelete
+                //and the information button on the right
+                let buttonInformation = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+                pinView!.rightCalloutAccessoryView = buttonInformation
+            } else {
+                pinView!.annotation = annotation
+            }
+            
+            return pinView
 
+        } else {
+            let reuseIdForPin = "tempPin"
+            var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdForPin) as? MKPinAnnotationView
+            
+            if pinView == nil {
+                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdForPin)
+                pinView!.canShowCallout = false
+                pinView!.draggable = true
+                pinView!.pinColor = .Green
+                pinView!.animatesDrop = false
+            } else {
+                pinView!.annotation = annotation
+            }
+            
+            return pinView
+
+        }
     }
 
     //Handle the buttonactions of the pin annotation
@@ -180,6 +184,26 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         }
     }
     
+    //func saveTravelLocation
+
+    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+        
+        if newState == .Ending {
+            let newAnnotation = view.annotation as! MKPointAnnotation
+            //save to core data
+            let newLocation = TravelLocation(annotation: newAnnotation, context: self.sharedContext)
+            CoreDataStackManager.sharedInstance().saveContext()
+            self.locations.append(newLocation)
+            mapView.removeAnnotation(view.annotation) // remove the draggable temp annotation
+            mapView.addAnnotation(newLocation.annotation) // and replace it by the permanent one
+            // get a set of images for this location
+            FlickrClient.sharedInstance().getImagesForLocation(newLocation) {succes, message, error in
+                // ????
+            }
+            
+        }
+    }
+
     
     // Mark: - Prepare the segue
     
@@ -235,22 +259,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     }
 
    
-    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
-        if newState == .Ending {
-            view.draggable = false
-            println("draggin no more...")
-            //save to core data
-//            let newLocation = TravelLocation(annotation: annotation, context: self.sharedContext)
-//            self.locations.append(newLocation)
-//            CoreDataStackManager.sharedInstance().saveContext()
-//            
-//            // get a set of images for this location
-//            FlickrClient.sharedInstance().getImagesForLocation(newLocation) {succes, message, error in
-//                // ????
-//            }
-
-        }
-    }
+    
     
    
     // MARK: - NSKeyedArchiver : Save/Restore the map settings

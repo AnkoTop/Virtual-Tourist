@@ -11,7 +11,7 @@ import MapKit
 
 class MKPointAnnotationForTravelLocation: MKPointAnnotation {
     
-    // asubclassed to ad travellocation 
+    // subclassed to add travellocation
     var forTravelLocation : TravelLocation?
     
 }

@@ -22,7 +22,7 @@ class TravelLocation: NSManagedObject {
     @NSManaged var photos : [Photo]?
     
     // compute property; no need to store it in core data
-    var annotation : MKPointAnnotation {
+    var annotation : MKPointAnnotationForTravelLocation {
         get {
             let newAnnotation = MKPointAnnotationForTravelLocation()
             newAnnotation.coordinate = CLLocationCoordinate2DMake(latitude, longitude)
