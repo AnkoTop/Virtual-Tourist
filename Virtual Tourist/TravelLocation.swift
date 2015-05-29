@@ -21,7 +21,8 @@ class TravelLocation: NSManagedObject {
     @NSManaged var subTitle : String?
     @NSManaged var photos : [Photo]?
     
-    // compute property; no need to store it in core data
+    
+    // computed property; no need to store it in core data
     var annotation : MKPointAnnotationForTravelLocation {
         get {
             let newAnnotation = MKPointAnnotationForTravelLocation()

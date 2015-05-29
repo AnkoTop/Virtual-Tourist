@@ -10,8 +10,6 @@ import UIKit
 
 class TagCollectionViewCell: UICollectionViewCell {
     
-
     @IBOutlet weak var tagLabel: UILabel!
-     
     
 }

@@ -11,4 +11,5 @@ import UIKit
 class PhotoAlbumHeaderCollectionReusableView: UICollectionReusableView {
         
     @IBOutlet weak var sectionHeaderImage: UIImageView!
+
 }

@@ -25,7 +25,7 @@ class ImageCache {
         var data: NSData?
         
         // First try the memory cache
-        if let image = inMemoryCache.objectForKey(path) as? UIImage {
+      if let image = inMemoryCache.objectForKey(path) as? UIImage {
             return image
         }
         

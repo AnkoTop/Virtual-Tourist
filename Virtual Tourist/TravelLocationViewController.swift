@@ -12,12 +12,12 @@ import MapKit
 
 class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate {
     
-    var selectedLocation: TravelLocation!
-    var currentPinView: MKAnnotationView!
     
     @IBOutlet weak var mapView: MKMapView!
     
     var locations = [TravelLocation]()
+    var selectedLocation: TravelLocation!
+    var currentPinView: MKAnnotationView!
     
     
     override func viewDidLoad() {
@@ -41,6 +41,12 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
        
         //default maptype is Standard
         mapView.mapType = .Standard
+        
+        //check for an internet connection
+        if Reachability.isNotConnectedToNetwork() {
+            var alert = UIAlertView(title: "No internet connection", message: "You need an internet connection to add locations and get new photo's from Flickr.", delegate: nil, cancelButtonTitle: "OK")
+            alert.show()
+        }
         
     }
     
@@ -148,7 +154,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
                 pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseIdForPin)
                 pinView!.canShowCallout = false
                 pinView!.draggable = true
-                pinView!.pinColor = .Green
+                pinView!.pinColor = .Purple
                 pinView!.animatesDrop = false
             } else {
                 pinView!.annotation = annotation
@@ -175,12 +181,12 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         self.currentPinView = annotationView
         
         if control == annotationView.leftCalloutAccessoryView { // delete button tapped
-            sharedContext.deleteObject(selectedLocation)
+            managedContext.deleteObject(selectedLocation)
             CoreDataStackManager.sharedInstance().saveContext()
             self.mapView.removeAnnotation(annotationView.annotation)
         } else if control == annotationView.rightCalloutAccessoryView { // info button tapped
             
-            performSegueWithIdentifier(Constants.SegueIdentifier.showPhotoAlbum , sender: self) // segue to the collection view
+            performSegueWithIdentifier(Constants.SegueIdentifier.ShowPhotoAlbum , sender: self) // segue to the collection view
         }
     }
     
@@ -190,17 +196,42 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         
         if newState == .Ending {
             let newAnnotation = view.annotation as! MKPointAnnotation
-            //save to core data
-            let newLocation = TravelLocation(annotation: newAnnotation, context: self.sharedContext)
-            CoreDataStackManager.sharedInstance().saveContext()
-            self.locations.append(newLocation)
-            mapView.removeAnnotation(view.annotation) // remove the draggable temp annotation
-            mapView.addAnnotation(newLocation.annotation) // and replace it by the permanent one
-            // get a set of images for this location
-            FlickrClient.sharedInstance().getImagesForLocation(newLocation) {succes, message, error in
-                // ????
-            }
-            
+            //pin can be moved anywhere so geocode again
+            let coordinate = newAnnotation.coordinate
+            var location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+            CLGeocoder().reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
+                if error == nil {
+                    let placemark = CLPlacemark(placemark: placemarks[0] as! CLPlacemark)
+                    var city = placemark.subAdministrativeArea != nil ? placemark.subAdministrativeArea : ""
+                    var state = placemark.administrativeArea != nil ? placemark.administrativeArea : ""
+                    var country = placemark.country != nil ? placemark.country : ""
+                    var title = "\(city) - \(state)"
+                    var subTitle = "\(country)"
+                    if city == "" {
+                        if state == "" { title = ""
+                        } else { title = "\(state)" }
+                    } else {
+                        if state == "" { title = "\(city)" }
+                    }
+                    
+                    newAnnotation.title = title
+                    newAnnotation.subtitle = subTitle
+                    
+                    //save to core data
+                    let newLocation = TravelLocation(annotation: newAnnotation, context: self.managedContext)
+                    CoreDataStackManager.sharedInstance().saveContext()
+                    // get a set of images for this location
+                    FlickrClient.sharedInstance().getImagesFor(newLocation) {succes, message, error in
+                        if !succes {
+                            var alert = UIAlertView(title: "Error while retrieving the images", message: "Sorry, we encountered an error : \(message)", delegate: nil, cancelButtonTitle: "OK")
+                            alert.show()
+                        }
+                    }
+                    self.locations.append(newLocation)
+                    mapView.removeAnnotation(view.annotation) // remove the draggable temp annotation
+                    mapView.addAnnotation(newLocation.annotation) // and replace it by the permanent one
+                }
+            })
         }
     }
 
@@ -209,7 +240,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
-       if segue.identifier == Constants.SegueIdentifier.showPhotoAlbum {
+       if segue.identifier == Constants.SegueIdentifier.ShowPhotoAlbum {
             let controller = segue.destinationViewController as! PhotoAlbumCollectionViewController
         
             //send a snapshot from the selected location as a headerimage for the collectionview
@@ -242,18 +273,22 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
     // MARK: - Core Data: use the basic version (the fetchedresultcontroller has no added value for TravelLocations)
     
-    var sharedContext: NSManagedObjectContext {
+    var managedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
+    
+//    var privateContext: NSManagedObjectContext {
+//        return CoreDataStackManager.sharedInstance().privateContext!
+//    }
     
     func fetchAllTravelLocations() -> [TravelLocation] {
         var error: NSError?
         let fetchRequest = NSFetchRequest(entityName: "TravelLocation")
-        let results = sharedContext.executeFetchRequest(fetchRequest, error: &error)
+        let results = managedContext.executeFetchRequest(fetchRequest, error: &error)
         
         if let error = error {
-            // XXXX  ADD MESSAGE
-            println("Error in fectchAllTravelLocations(): \(error)")
+            var alert = UIAlertView(title: "Error while retrieving the locations", message: "Sorry, we encountered an error : \(error.localizedDescription)", delegate: nil, cancelButtonTitle: "OK")
+            alert.show()
         }
         return results as! [TravelLocation]
     }

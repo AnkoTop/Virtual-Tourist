@@ -13,47 +13,58 @@ import CoreData
 extension FlickrClient {
     
     
-    func getPhotoFromUrlFor(location: TravelLocation, photo: Photo) {
+    func getPhotoFromUrlFor(photo: Photo) {
         //Make sure the photo is not deleted in the meantime!
         if !(photo.managedObjectContext == nil) {
-            let imageURL = NSURL(string: photo.remoteFilePath)
-            if let imageData = NSData(contentsOfURL: imageURL!) {
-                if !(photo.managedObjectContext == nil) {
-                    photo.localImage = UIImage(data: imageData)
-                    let trick = photo.localFilePath
-                    photo.localFilePath =  trick
-                    CoreDataStackManager.sharedInstance().saveContext()
-                }
+            let qos = Int(DISPATCH_QUEUE_PRIORITY_DEFAULT.value)
+            dispatch_async(dispatch_get_global_queue(qos, 0)) {
+                let imageURL = NSURL(string: photo.remoteFilePath)
+                var request: NSURLRequest = NSURLRequest(URL: imageURL!)
+                let queue:NSOperationQueue = NSOperationQueue()
+                NSURLConnection.sendAsynchronousRequest(request, queue: queue, completionHandler:{ (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+                    var err: NSError
+                    // this happens on another thread; the phote can be deleted so check
+                    if photo.managedObjectContext != nil && !photo.deleted {
+                        if error == nil {
+                            dispatch_async(dispatch_get_main_queue()) {
+                                photo.localImage = UIImage(data: data)
+                                photo.downloaded = true
+                                CoreDataStackManager.sharedInstance().saveContext()
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    }
+    
+  
+    
+    func getImagesFor(location: TravelLocation, completionHandler: (succes:Bool, message: String, error: NSError?) -> Void) {
+        
+        //delete all the old ones
+        if location.photos != nil{
+            var delete : NSArray = location.photos!
+            for photo in delete   {
+                sharedContext.deleteObject(photo as! NSManagedObject)
+                CoreDataStackManager.sharedInstance().saveContext()
             }
         }
         
-    }
-    
-    func deleteImagesForLocation (location: TravelLocation, completionHandler: (succes:Bool, message: String, error: NSError?) -> Void) {
-        for photo in location.photos! {
-            sharedContext.deleteObject(photo)
-            CoreDataStackManager.sharedInstance().saveContext()
-        }
-        
-        completionHandler(succes: true, message: "all photo's are deleted", error: nil)
-    }
-    
-    
-    func getImagesForLocation(location: TravelLocation, completionHandler: (succes:Bool, message: String, error: NSError?) -> Void) {
         //create bbox from the coordinates
         let hW = Constants.BoundingBoxHalfWidth
         let hH = Constants.BoundingboxHalfHeight
         let bbox = "\(location.longitude - hW),\(location.latitude - hH),\(location.longitude + hW),\(location.latitude + hH)"
         // set the methodarguments
         let methodArguments :[String: AnyObject] = [
-            Arguments.method: Constants.methodName,
-            Arguments.apiKey: Constants.apiKey,
-            Arguments.bbox: bbox,
-            Arguments.safeSearch: Constants.safeSearch,
-            Arguments.extras: Constants.extras,
-            Arguments.format: Constants.format,
-            Arguments.noJsonCallback: Constants.noJsonCallback,
-            Arguments.perPage: Constants.perPage
+            Arguments.Method: Constants.MethodName,
+            Arguments.ApiKey: Constants.ApiKey,
+            Arguments.Bbox: bbox,
+            Arguments.SafeSearch: Constants.SafeSearch,
+            Arguments.Extras: Constants.Extras,
+            Arguments.Format: Constants.Format,
+            Arguments.NoJsonCallback: Constants.NoJsonCallback,
+            Arguments.PerPage: Constants.PerPage
         ]
         
         getImagesFromFlickrBySearch(location, methodArguments: methodArguments, completionHandler: completionHandler)
@@ -66,16 +77,17 @@ extension FlickrClient {
             if let error = error {
                 completionHandler(succes: false, message: "Error in Network connection", error: error)
             } else {
-               if let photosDictionary = JSONResult.valueForKey("photos") as? [String:AnyObject] {
+                if let photosDictionary = JSONResult.valueForKey("photos") as? [String:AnyObject] {
                 
                     if let totalPages = photosDictionary["pages"] as? Int {
-                        let pageLimit = min(totalPages, Constants.perPage)
+                        let pageLimit = min(totalPages, Constants.PerPage)
                         let randomPage = Int(arc4random_uniform(UInt32(pageLimit) + 1))
                         self.getImagesFromFlickrBySearchWithPage(location, pageNumber: randomPage, methodArguments: methodArguments, completionHandler: completionHandler)
                     } else {
                         completionHandler(succes: false, message: "Cant find key 'pages' in dictionary", error: error)
-                        println("Cant find key 'pages' in \(photosDictionary)")
                     }
+                } else {
+                    completionHandler(succes: false, message: "No photos found for this location.", error: error)
                 }
             }
         }
@@ -95,19 +107,19 @@ extension FlickrClient {
                     }
                     if totalPhotosVal > 0 {
                         if let photosArray = photosDictionary["photo"] as? [[String: AnyObject]] {
-                        
                             for photo in photosArray {
                                 let imageUrlString = photo["url_m"] as? String
-                                
                                 var newPhoto =  Photo(remoteFileName: photo["url_m"] as! String, travelLocation: location, context: self.sharedContext)
                                 CoreDataStackManager.sharedInstance().saveContext()
-                            
                             }
-                         completionHandler(succes: true, message: "", error: error)
+                            completionHandler(succes: true, message: "", error: error)
+                       
                         } else {
                         
-                        completionHandler(succes: false, message: "No photos found", error: error)
+                            completionHandler(succes: false, message: "No photos found for this location.", error: error)
                         }
+                    } else {
+                       completionHandler(succes: false, message: "No photos found for this location.", error: error)
                     }
                 }
             }

@@ -122,7 +122,7 @@
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="du5-kp-MV7"/>
                         <barButtonItem title="New Collection" id="Yj6-jN-mRF">
                             <connections>
-                                <action selector="getNewPhotoCollection:" destination="HuT-P5-jGB" id="X6U-1t-G0G"/>
+                                <action selector="getNewPhotoCollection:" destination="HuT-P5-jGB" id="v87-ED-flW"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="AEM-R8-Mqy"/>
@@ -139,6 +139,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="newCollectionButton" destination="Yj6-jN-mRF" id="UU9-xr-XBZ"/>
                         <outlet property="photoCollectionView" destination="ylO-Fg-QAs" id="JS4-in-dYy"/>
                         <segue destination="HYt-ZE-zJ2" kind="show" identifier="showImageDetails" id="P2N-Ne-RI4"/>
                     </connections>
@@ -179,7 +180,7 @@
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="Xlf-ds-ebL">
                                                     <rect key="frame" x="8" y="5" width="190" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -220,7 +221,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tag your travel location!" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GRv-3n-8go">
                                 <rect key="frame" x="209" y="30" width="183" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zaA-kJ-m0u">

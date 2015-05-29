@@ -11,14 +11,13 @@ import Foundation
 struct Constants {
     
     struct SegueIdentifier {
-        static let showPhotoAlbum = "showPhotoAlbum"
-        static let showImageDetails = "showImageDetails"
-        static let showTags = "showTags"
-    
+        static let ShowPhotoAlbum = "showPhotoAlbum"
+        static let ShowImageDetails = "showImageDetails"
+        static let ShowTags = "showTags"
     }
     
     struct Limits {
-        static let maxNumberOfTagsForLocation = 5
+        static let MaxNumberOfTagsForLocation = 5
     }
     
 }

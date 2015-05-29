@@ -16,12 +16,6 @@ class ImageDetailsViewController: UIViewController {
     @IBOutlet weak var detailImage: UIImageView!
     
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-    }
-
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
        

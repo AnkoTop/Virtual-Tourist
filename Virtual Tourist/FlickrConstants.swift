@@ -11,27 +11,27 @@ import Foundation
 extension FlickrClient {
     
     struct Constants {
-        static let baseSecureUrl = "https://api.flickr.com/services/rest/"
-        static let methodName = "flickr.photos.search"
-        static let apiKey = "ac8c28e52697be4b3265c47a4480efed"
-        static let extras = "url_m"
-        static let safeSearch = "1"
-        static let format = "json"
-        static let noJsonCallback = "1"
+        static let BaseSecureUrl = "https://api.flickr.com/services/rest/"
+        static let MethodName = "flickr.photos.search"
+        static let ApiKey = "ac8c28e52697be4b3265c47a4480efed"
+        static let Extras = "url_m"
+        static let SafeSearch = "1"
+        static let Format = "json"
+        static let NoJsonCallback = "1"
         static let BoundingBoxHalfWidth = 1.0
         static let BoundingboxHalfHeight = 1.0
-        static let perPage = 24
+        static let PerPage = 24
      }
     
     struct Arguments {
-        static let method = "method"
-        static let apiKey = "api_key"
-        static let bbox = "bbox"
-        static let safeSearch = "safe_search"
-        static let extras = "extras"
-        static let format = "format"
-        static let noJsonCallback = "nojsoncallback"
-        static let perPage = "per_page"
+        static let Method = "method"
+        static let ApiKey = "api_key"
+        static let Bbox = "bbox"
+        static let SafeSearch = "safe_search"
+        static let Extras = "extras"
+        static let Format = "format"
+        static let NoJsonCallback = "nojsoncallback"
+        static let PerPage = "per_page"
     }
     
 }

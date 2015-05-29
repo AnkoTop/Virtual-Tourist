@@ -59,13 +59,19 @@ class CoreDataStackManager {
         return coordinator
         }()
     
+    
+    // The managed version for main thread
+    
     lazy var managedObjectContext: NSManagedObjectContext? = {
         let coordinator = self.persistentStoreCoordinator
         if coordinator == nil {
             return nil
         }
-        var managedObjectContext = NSManagedObjectContext()
+        var managedObjectContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
         managedObjectContext.persistentStoreCoordinator = coordinator
+        
+       //managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
         return managedObjectContext
         }()
     
@@ -83,4 +89,5 @@ class CoreDataStackManager {
             }
         }
     }
+    
 }

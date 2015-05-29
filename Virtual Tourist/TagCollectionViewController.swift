@@ -57,12 +57,7 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
        
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    
+   
     @IBAction func deleteTag(sender: UIButton) {
         
         // delete from currenttags & refresh collection
@@ -75,7 +70,6 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
         CoreDataStackManager.sharedInstance().saveContext()
         
         deleteButton.enabled = false
-        
     }
     
     
@@ -98,17 +92,17 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
     
     
     func setAddTagButton() -> Bool {
-        if currentTags.count >= Constants.Limits.maxNumberOfTagsForLocation {
+        if currentTags.count >= Constants.Limits.MaxNumberOfTagsForLocation {
+     
             addButton.enabled = false
             
-            var composeAlert = UIAlertController(title: "Max tags reached!", message: "Sorry, you can add max \(Constants.Limits.maxNumberOfTagsForLocation) tags for a location.", preferredStyle: UIAlertControllerStyle.Alert)
-            composeAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
-                // 
-                
-            }))
-            presentViewController(composeAlert, animated: true, completion: nil)
+            var alert = UIAlertView(title: "Max tags reached!", message: "Sorry, you can add max \(Constants.Limits.MaxNumberOfTagsForLocation) tags for a location.", delegate: nil, cancelButtonTitle: "OK")
+            alert.show()
+            
             return false
+       
         } else {
+   
             addButton.enabled = true
             return true
         }
@@ -120,25 +114,36 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
     
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
         if setAddTagButton() == true {
+     
             return true
+    
         } else {
+      
             return false
+     
         }
     }
+ 
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         keywordText.resignFirstResponder()
+   
         return true
     }
     
+    
     func textFieldDidBeginEditing(textField: UITextField) {
-         addButton.enabled = true
+    
+        addButton.enabled = true
+    
     }
     
+    
     func textFieldDidEndEditing(textField: UITextField) {
-        // add the tag
+       
         addTag(self)
         addButton.enabled = false
+ 
     }
     
     
@@ -206,7 +211,5 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
         
         return results as! [Tag]
     }
-    
-
 
 }

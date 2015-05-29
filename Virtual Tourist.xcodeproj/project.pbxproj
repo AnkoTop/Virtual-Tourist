@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A42195521B173C060052DB07 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42195511B173C060052DB07 /* Reachability.swift */; };
 		A43507511B01EA8B002BD952 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43507501B01EA8B002BD952 /* ImageCache.swift */; };
 		A447A1E61AF78B93001E734A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A447A1E51AF78B93001E734A /* AppDelegate.swift */; };
 		A447A1EB1AF78B93001E734A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A447A1E91AF78B93001E734A /* Main.storyboard */; };
@@ -43,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A42195511B173C060052DB07 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		A43507501B01EA8B002BD952 /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		A447A1E01AF78B93001E734A /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A447A1E41AF78B93001E734A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 		A498A65E1B108CAB001CB000 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		A498A6601B1108E6001CB000 /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		A498A6621B11F8BB001CB000 /* TagCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagCollectionViewCell.swift; sourceTree = "<group>"; };
+		A4A8892F1B18E50A00B9E97E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +129,7 @@
 			children = (
 				A486A03A1B13385E002CE6B8 /* Images.xcassets */,
 				A447A1E41AF78B93001E734A /* Info.plist */,
+				A4A8892F1B18E50A00B9E97E /* README.md */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -168,6 +172,7 @@
 				A447A2111AF90CE2001E734A /* FlickrClient.swift */,
 				A447A2131AF90D18001E734A /* FlickrConstants.swift */,
 				A43507501B01EA8B002BD952 /* ImageCache.swift */,
+				A42195511B173C060052DB07 /* Reachability.swift */,
 			);
 			name = WebService;
 			sourceTree = "<group>";
@@ -313,6 +318,7 @@
 				A47DE74F1AFDEA5C0065B96F /* FlickrConvenience.swift in Sources */,
 				A47DE7531B00F4B50065B96F /* TagCollectionViewController.swift in Sources */,
 				A498A65D1B0FD087001CB000 /* MKPointAnnotationForTravelLocation.swift in Sources */,
+				A42195521B173C060052DB07 /* Reachability.swift in Sources */,
 				A447A2121AF90CE2001E734A /* FlickrClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

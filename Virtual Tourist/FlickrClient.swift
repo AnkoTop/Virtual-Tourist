@@ -19,7 +19,7 @@ class FlickrClient: NSObject {
     
     
     func taskForGetBySearch(methodArguments: [String : AnyObject], completionHandler: (result: AnyObject!, error: NSError?) -> Void) -> NSURLSessionDataTask {
-        let urlString = Constants.baseSecureUrl + escapedParameters(methodArguments)
+        let urlString = Constants.BaseSecureUrl + escapedParameters(methodArguments)
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
         
@@ -42,7 +42,7 @@ class FlickrClient: NSObject {
         /* Add the page to the method's arguments */
         var withPageDictionary = methodArguments
         withPageDictionary["page"] = pageNumber
-        let urlString = Constants.baseSecureUrl + escapedParameters(withPageDictionary)
+        let urlString = Constants.BaseSecureUrl + escapedParameters(withPageDictionary)
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
         
