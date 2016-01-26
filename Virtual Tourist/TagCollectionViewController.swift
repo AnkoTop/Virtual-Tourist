@@ -61,7 +61,7 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
     @IBAction func deleteTag(sender: UIButton) {
         
         // delete from currenttags & refresh collection
-        var indexPath  = self.tagCollectionView.indexPathsForSelectedItems()[0] as! NSIndexPath
+        let indexPath  = self.tagCollectionView.indexPathsForSelectedItems()![0] 
         self.currentTags.removeAtIndex(indexPath.item)
         self.tagCollectionView.reloadData()
     
@@ -79,7 +79,7 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
         
         if keywordText.text != "" {
             //add to coredata
-            let newTag = Tag(keyword: keywordText.text, travelLocation: currentLocation, context: sharedContext)
+            let newTag = Tag(keyword: keywordText.text!, travelLocation: currentLocation, context: sharedContext)
             CoreDataStackManager.sharedInstance().saveContext()
             
             // add to currentTags & refresh collection
@@ -96,7 +96,7 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
      
             addButton.enabled = false
             
-            var alert = UIAlertView(title: "Max tags reached!", message: "Sorry, you can add max \(Constants.Limits.MaxNumberOfTagsForLocation) tags for a location.", delegate: nil, cancelButtonTitle: "OK")
+            let alert = UIAlertView(title: "Max tags reached!", message: "Sorry, you can add max \(Constants.Limits.MaxNumberOfTagsForLocation) tags for a location.", delegate: nil, cancelButtonTitle: "OK")
             alert.show()
             
             return false
@@ -197,12 +197,18 @@ class TagCollectionViewController: UIViewController, UICollectionViewDataSource,
         let fetchRequest = NSFetchRequest(entityName: "Tag")
         fetchRequest.predicate = NSPredicate(format: "location == %@", self.currentLocation); // only for the current location
 
-        let results = sharedContext.executeFetchRequest(fetchRequest, error: &error)
+        let results: [AnyObject]?
+        do {
+            results = try sharedContext.executeFetchRequest(fetchRequest)
+        } catch let error1 as NSError {
+            error = error1
+            results = nil
+        }
         
         // check for errors
         if let error = error {
-            var composeAlert = UIAlertController(title: "Error in retrieving tags", message: "Sorry, we encountered this error : \(error)", preferredStyle: UIAlertControllerStyle.Alert)
-            composeAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+            let composeAlert = UIAlertController(title: "Error in retrieving tags", message: "Sorry, we encountered this error : \(error)", preferredStyle: UIAlertControllerStyle.Alert)
+            composeAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction) in
                 //
                 
             }))

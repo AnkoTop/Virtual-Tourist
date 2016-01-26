@@ -13,7 +13,7 @@ public class Reachability {
     class func isConnectedToNetwork()->Bool{
         
         var Status:Bool = false
-        let url = NSURL(string: "http://google.com/")
+        let url = NSURL(string: "https://google.com/")
         let request = NSMutableURLRequest(URL: url!)
         request.HTTPMethod = "HEAD"
         request.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData
@@ -21,7 +21,7 @@ public class Reachability {
         
         var response: NSURLResponse?
         
-        var data = NSURLConnection.sendSynchronousRequest(request, returningResponse: &response, error: nil) as NSData?
+        var data = (try? NSURLConnection.sendSynchronousRequest(request, returningResponse: &response)) as NSData?
         
         if let httpResponse = response as? NSHTTPURLResponse {
             if httpResponse.statusCode == 200 {
@@ -35,7 +35,7 @@ public class Reachability {
     class func isNotConnectedToNetwork()->Bool{
         
         var Status:Bool = true
-        let url = NSURL(string: "http://google.com/")
+        let url = NSURL(string: "https://google.com/")
         let request = NSMutableURLRequest(URL: url!)
         request.HTTPMethod = "HEAD"
         request.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData
@@ -43,7 +43,7 @@ public class Reachability {
         
         var response: NSURLResponse?
         
-        var data = NSURLConnection.sendSynchronousRequest(request, returningResponse: &response, error: nil) as NSData?
+        var data = (try? NSURLConnection.sendSynchronousRequest(request, returningResponse: &response)) as NSData?
         
         if let httpResponse = response as? NSHTTPURLResponse {
             if httpResponse.statusCode == 200 {

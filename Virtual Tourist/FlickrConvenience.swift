@@ -21,13 +21,13 @@ extension FlickrClient {
                 let imageURL = NSURL(string: photo.remoteFilePath)
                 var request: NSURLRequest = NSURLRequest(URL: imageURL!)
                 let queue:NSOperationQueue = NSOperationQueue()
-                NSURLConnection.sendAsynchronousRequest(request, queue: queue, completionHandler:{ (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+                NSURLConnection.sendAsynchronousRequest(request, queue: queue, completionHandler:{ (response: NSURLResponse?, data: NSData?, error: NSError?) -> Void in
                     var err: NSError
                     // this happens on another thread; the phote can be deleted so check
                     if photo.managedObjectContext != nil && !photo.deleted {
                         if error == nil {
                             dispatch_async(dispatch_get_main_queue()) {
-                                photo.localImage = UIImage(data: data)
+                                photo.localImage = UIImage(data: data!)
                                 photo.downloaded = true
                                 CoreDataStackManager.sharedInstance().saveContext()
                             }
@@ -44,7 +44,7 @@ extension FlickrClient {
         
         //delete all the old ones
         if location.photos != nil{
-            var delete : NSArray = location.photos!
+            let delete : NSArray = location.photos!
             for photo in delete   {
                 sharedContext.deleteObject(photo as! NSManagedObject)
                 CoreDataStackManager.sharedInstance().saveContext()

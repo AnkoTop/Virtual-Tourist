@@ -25,9 +25,9 @@ class FlickrClient: NSObject {
         
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
             if let error = downloadError {
-                println("Could not complete the request \(error)")
+                print("Could not complete the request \(error)")
             } else {
-                FlickrClient.parseJSONWithCompletionHandler(data, completionHandler: completionHandler)
+                FlickrClient.parseJSONWithCompletionHandler(data!, completionHandler: completionHandler)
             }
         }
         
@@ -48,9 +48,9 @@ class FlickrClient: NSObject {
         
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
             if let error = downloadError {
-                println("Could not complete the request \(error)")
+                print("Could not complete the request \(error)")
             } else {
-              FlickrClient.parseJSONWithCompletionHandler(data, completionHandler: completionHandler)
+              FlickrClient.parseJSONWithCompletionHandler(data!, completionHandler: completionHandler)
             }
         }
         
@@ -77,7 +77,7 @@ class FlickrClient: NSObject {
             urlVars += [key + "=" + "\(replaceSpaceValue)"]
         }
         
-        return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
+        return (!urlVars.isEmpty ? "?" : "") + urlVars.joinWithSeparator("&")
     }
 
     
@@ -86,7 +86,13 @@ class FlickrClient: NSObject {
         
         var parsingError: NSError? = nil
         
-        let parsedResult: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error: &parsingError)
+        let parsedResult: AnyObject?
+        do {
+            parsedResult = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments)
+        } catch let error as NSError {
+            parsingError = error
+            parsedResult = nil
+        }
         
         if let error = parsingError {
             completionHandler(result: nil, error: error)

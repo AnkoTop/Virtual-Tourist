@@ -11,7 +11,7 @@ import CoreData
 
 let reuseIdentifier = "PhotoAlbumCell"
 
-class PhotoAlbumCollectionViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIPopoverPresentationControllerDelegate {
+class PhotoAlbumCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UIPopoverPresentationControllerDelegate {
     
     // will be set before segue from the mapView
     var currentLocation: TravelLocation!
@@ -30,8 +30,11 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
         self.navigationController?.navigationBarHidden = false
         self.setAllowNewCollectionTo(false)
         
-        // Fetch the results from coredata
-        fetchedResultsController.performFetch(nil)
+        do {
+            // Fetch the results from coredata
+            try fetchedResultsController.performFetch()
+        } catch _ {
+        }
         fetchedResultsController.delegate = self
         
         if fetchedResultsController.fetchedObjects!.count > 0 {
@@ -77,7 +80,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
             
         } else {
             
-            var alert = UIAlertView(title: "No images found", message: "Sorry, we found no (new) images for this location.", delegate: nil, cancelButtonTitle: "OK")
+            let alert = UIAlertView(title: "No images found", message: "Sorry, we found no (new) images for this location.", delegate: nil, cancelButtonTitle: "OK")
             alert.show()
             
         }
@@ -101,7 +104,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
     
     func showImageErrorWith(message: String) {
         // show the error
-        var alert = UIAlertView(title: "Problem retrieving a collection", message: "Sorry, we encountered an error : \(message)", delegate: nil, cancelButtonTitle: "OK")
+        let alert = UIAlertView(title: "Problem retrieving a collection", message: "Sorry, we encountered an error : \(message)", delegate: nil, cancelButtonTitle: "OK")
         alert.show()
     }
     
@@ -154,7 +157,7 @@ class PhotoAlbumCollectionViewController: UICollectionViewController, UICollecti
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 
-        let sectionInfo = self.fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
+        let sectionInfo = self.fetchedResultsController.sections![section] 
         
         return sectionInfo.numberOfObjects
         
@@ -279,8 +282,9 @@ extension PhotoAlbumCollectionViewController: NSFetchedResultsControllerDelegate
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
         //
     }
-    
+  
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    //func controller(controller: NSFetchedResultsController, didChangeObject anObject: NSManagedObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
  
         let changedPhoto = anObject as! Photo
         

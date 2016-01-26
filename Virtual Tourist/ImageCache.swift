@@ -48,7 +48,7 @@ class ImageCache {
         
         // And in documents directory
         let data = UIImageJPEGRepresentation(image!, 1)
-        data.writeToFile(path, atomically: true)
+        data!.writeToFile(path, atomically: true)
     }
     
     // MARK: - Delete images
@@ -57,14 +57,17 @@ class ImageCache {
         let path = pathForIdentifier(identifier)
 
         inMemoryCache.removeObjectForKey(path)
-        NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(path)
+        } catch _ {
+        }
     }
     
     
     // MARK: - Helper
     
     func pathForIdentifier(identifier: String) -> String {
-        let documentsDirectoryURL: NSURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first as! NSURL
+        let documentsDirectoryURL: NSURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
         let fullURL = documentsDirectoryURL.URLByAppendingPathComponent(identifier)
         
         return fullURL.path!

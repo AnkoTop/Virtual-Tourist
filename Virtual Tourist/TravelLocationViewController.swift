@@ -44,7 +44,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         
         //check for an internet connection
         if Reachability.isNotConnectedToNetwork() {
-            var alert = UIAlertView(title: "No internet connection", message: "You need an internet connection to add locations and get new photo's from Flickr.", delegate: nil, cancelButtonTitle: "OK")
+            let alert = UIAlertView(title: "No internet connection", message: "You need an internet connection to add locations and get new photo's from Flickr.", delegate: nil, cancelButtonTitle: "OK")
             alert.show()
         }
         
@@ -66,9 +66,22 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
             case .Standard:
                 mapView.mapType = .Satellite
             case .Satellite :
+                if #available(iOS 9.0, *) {
+                    mapView.mapType = .SatelliteFlyover
+                } else {
+                    mapView.mapType = .Hybrid
+                }
+            case.SatelliteFlyover:
                 mapView.mapType = .Hybrid
-        case .Hybrid :
+            case .Hybrid :
+                if #available(iOS 9.0, *) {
+                    mapView.mapType = .HybridFlyover
+                } else {
+                    mapView.mapType = .Standard
+                }
+            case .HybridFlyover:
                 mapView.mapType = .Standard
+        
         }
     }
     
@@ -86,7 +99,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         
             CLGeocoder().reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
                 if error == nil {
-                    let placemark = CLPlacemark(placemark: placemarks[0] as! CLPlacemark)
+                    let placemark = CLPlacemark(placemark: placemarks![0] as! CLPlacemark)
                     var city = placemark.subAdministrativeArea != nil ? placemark.subAdministrativeArea : ""
                     var state = placemark.administrativeArea != nil ? placemark.administrativeArea : ""
                     var country = placemark.country != nil ? placemark.country : ""
@@ -114,12 +127,12 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     // MARK: - MapviewDelegate
     
     // When the region changes by zooming or scrolling: save the new map state
-    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         saveMapRegion()
     }
     
     
-    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView! {
         
         // different pinview atrributes for different types of annotations
         if let anno = annotation as? MKPointAnnotationForTravelLocation {
@@ -133,12 +146,12 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
                 pinView!.pinColor = .Red
                 
                 //add a delete button on the left side
-                let buttonDelete = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+                let buttonDelete = UIButton(type: .DetailDisclosure)
                 buttonDelete.setBackgroundImage(UIImage(named: "trash"), forState: .Normal)
                 buttonDelete.tintColor = UIColor.clearColor()
                 pinView!.leftCalloutAccessoryView = buttonDelete
                 //and the information button on the right
-                let buttonInformation = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+                let buttonInformation = UIButton(type: .DetailDisclosure)
                 pinView!.rightCalloutAccessoryView = buttonInformation
             } else {
                 pinView!.annotation = annotation
@@ -166,7 +179,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     }
 
     //Handle the buttonactions of the pin annotation
-    func mapView(mapView: MKMapView!, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+    func mapView(mapView: MKMapView, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         
         if annotationView.draggable == true {
             annotationView.draggable = false
@@ -183,7 +196,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
         if control == annotationView.leftCalloutAccessoryView { // delete button tapped
             managedContext.deleteObject(selectedLocation)
             CoreDataStackManager.sharedInstance().saveContext()
-            self.mapView.removeAnnotation(annotationView.annotation)
+            self.mapView.removeAnnotation(annotationView.annotation!)
         } else if control == annotationView.rightCalloutAccessoryView { // info button tapped
             
             performSegueWithIdentifier(Constants.SegueIdentifier.ShowPhotoAlbum , sender: self) // segue to the collection view
@@ -192,7 +205,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
     //func saveTravelLocation
 
-    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+    func mapView(mapView: MKMapView, annotationView view: MKAnnotationView, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
         
         if newState == .Ending {
             let newAnnotation = view.annotation as! MKPointAnnotation
@@ -201,7 +214,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
             var location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
             CLGeocoder().reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
                 if error == nil {
-                    let placemark = CLPlacemark(placemark: placemarks[0] as! CLPlacemark)
+                    let placemark = CLPlacemark(placemark: placemarks![0] as! CLPlacemark)
                     var city = placemark.subAdministrativeArea != nil ? placemark.subAdministrativeArea : ""
                     var state = placemark.administrativeArea != nil ? placemark.administrativeArea : ""
                     var country = placemark.country != nil ? placemark.country : ""
@@ -228,7 +241,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
                         }
                     }
                     self.locations.append(newLocation)
-                    mapView.removeAnnotation(view.annotation) // remove the draggable temp annotation
+                    mapView.removeAnnotation(view.annotation!) // remove the draggable temp annotation
                     mapView.addAnnotation(newLocation.annotation) // and replace it by the permanent one
                 }
             })
@@ -264,7 +277,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
             let yAdjust = currentPinView.frame.origin.y
             rectangle.origin.y = -yAdjust
             self.view.drawViewHierarchyInRect(rectangle, afterScreenUpdates: true)
-            var snapshot : UIImage = UIGraphicsGetImageFromCurrentImageContext()
+            let snapshot : UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
         return snapshot
@@ -284,10 +297,16 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     func fetchAllTravelLocations() -> [TravelLocation] {
         var error: NSError?
         let fetchRequest = NSFetchRequest(entityName: "TravelLocation")
-        let results = managedContext.executeFetchRequest(fetchRequest, error: &error)
+        let results: [AnyObject]?
+        do {
+            results = try managedContext.executeFetchRequest(fetchRequest)
+        } catch let error1 as NSError {
+            error = error1
+            results = nil
+        }
         
         if let error = error {
-            var alert = UIAlertView(title: "Error while retrieving the locations", message: "Sorry, we encountered an error : \(error.localizedDescription)", delegate: nil, cancelButtonTitle: "OK")
+            let alert = UIAlertView(title: "Error while retrieving the locations", message: "Sorry, we encountered an error : \(error.localizedDescription)", delegate: nil, cancelButtonTitle: "OK")
             alert.show()
         }
         return results as! [TravelLocation]
@@ -301,7 +320,7 @@ class TravelLocationViewController: UIViewController, MKMapViewDelegate, UIGestu
     
     var filePath : String {
         let manager = NSFileManager.defaultManager()
-        let url = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first as! NSURL
+        let url = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first! as NSURL
         return url.URLByAppendingPathComponent("mapRegionArchive").path!
     }
     
